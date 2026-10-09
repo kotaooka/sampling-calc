@@ -241,6 +241,7 @@ section.panel-explain { margin-top: 20px; }
 .explain ul, .explain ol { padding-left: 1.4em; }
 footer.src { margin-top: 28px; font-size: .75rem; color: var(--muted); line-height: 1.7; max-width: 72ch; }
 footer.src a { color: var(--ink2); }
+footer.src p { margin: 0 0 6px; }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
 </head>
@@ -731,11 +732,12 @@ AOQ = Pa × p                      （N を入力しないとき）
 </section>
 
 <footer class="src">
-  AQL表の出典: MIL-STD-105E（1989-05-10）表I・表II-A/B/C、DTIC
-  <a href="https://apps.dtic.mil/sti/tr/pdf/ADA284013.pdf" target="_blank" rel="noopener">ADA284013</a>（Distribution Statement A）。
-  JIS Z 9015-1:2006（ISO 2859-1:1999）とは、ゆるい検査の方式と切替ルールが異なる。なみ・きつい検査の表を現行JISとして扱う場合は、JIS本文と照合すること。
-  AOQ・ATI は「不合格ロットを全数選別し、不良品を良品に置き換える」前提の値。区間推定は Clopper-Pearson 法（正確法）。
-  合格率タブは超幾何分布による厳密計算で、流出する不良は「不合格ロットは出荷しない」前提の値。
+  <p>AQL表の出典は MIL-STD-105E（1989-05-10）表I・表II-A/B/C、DTIC
+  <a href="https://apps.dtic.mil/sti/tr/pdf/ADA284013.pdf" target="_blank" rel="noopener">ADA284013</a>（Distribution Statement A）です。
+  JIS Z 9015-1:2006（ISO 2859-1:1999）とは、ゆるい検査の方式と切替ルールが異なります。なみ・きつい検査の表を現行JISとして扱う場合は、JIS本文と照合してください。
+  AOQ・ATI は「不合格ロットを全数選別し、不良品を良品に置き換える」前提の値です。区間推定は Clopper-Pearson 法（正確法）です。
+  合格率タブは超幾何分布による厳密計算で、流出する不良は「不合格ロットは出荷しない」前提の値です。</p>
+  <p><a href="https://github.com/kotaooka/sampling-calc">GitHub</a> ・ MIT License</p>
 </footer>
 </main>
 
