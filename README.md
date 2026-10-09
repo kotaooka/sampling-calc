@@ -95,3 +95,9 @@
 ## 開発者向けの情報
 
 ファイル構成、更新して公開する手順、計算方法、AQL表データの出典、テストについては [DEVELOPMENT.md](DEVELOPMENT.md) を参照してください。
+
+---
+
+## ライセンス
+
+[MIT License](LICENSE)
