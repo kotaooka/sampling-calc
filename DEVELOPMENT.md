@@ -14,7 +14,7 @@ icons/                アプリアイコン
 js/app.js             画面処理・グラフ描画
 js/stats.js           統計計算（外部ライブラリなし。Node でも読み込み可）
 js/aql-table.js       MIL-STD-105E の表データ
-tests/                計算の照合テスト（test.js / test.html / check.js / reference.js）
+tests/                計算の照合テスト（test.js / test.html / check.js / reference.js）と原本の抽出値（mil105e-legible.js / extract_mil105e.py）
 .github/workflows/     push 時の自動テスト
 docs/screenshots/     README 用のスクリーンショット
 tools/screenshots.py  スクリーンショットの撮影スクリプト
@@ -43,11 +43,17 @@ tools/screenshots.py  スクリーンショットの撮影スクリプト
 
 - 出典：MIL-STD-105E（1989-05-10）表I・表II-A/B/C、DTIC ADA284013（Distribution Statement A、配布制限なし）
 - `js/aql-table.js` に、矢印を読み替え済みの [サンプル数, 合格判定個数, 不合格判定個数] で格納しています
-- なみ検査は、表の対角構造から独立に組んだ値と全 416 セルを照合し、一致を確認しています。きつい検査・ゆるい検査は R パッケージ AQLSchemes 1.7-2 の値で、原本との照合は未実施です
+- なみ検査は、表の対角構造から独立に組んだ値と全 416 セルを照合し、一致を確認しています。きつい検査・ゆるい検査の値は R パッケージ AQLSchemes 1.7-2 から取りました
+- 原本との照合：MIL-STD-105E の判読用写し（テキスト層つき PDF）から `tests/extract_mil105e.py` で表I・表II-A/B/C を機械的に抽出し（`tests/mil105e-legible.js`）、表I 全 15 行と表II-A/B/C の全 1,248 セル（3表 × 16 文字 × 26 AQL、矢印は読み替え後）が一致することをテストで確認しています
+- 写しには転記の誤りが3種類あり、テストでは訂正してから照合しています（`tests/check.js` に根拠つきで記載）
+  - 表II-A の「44 65」（正しくは 44 45。なみ検査の一回抜取は常に Re = Ac + 1）
+  - 表I 51〜90 の行（次の行と同じ並びになっている。正しくは B B C C C E F）
+  - 表I 501〜1200 の水準 III（H になっている。正しくは K）
+- 抽出のやり直し：`pip install pymupdf` のうえ `python tests/extract_mil105e.py <PDF>`。数字はテキスト層の座標から、矢印は PDF のベクター図形（軸＋矢じり）から読み取ります
 
 ## テスト
 
-計算結果を scipy で求めた参照値と、AQL 表を既知の値と照合します。照合ロジックは `tests/check.js` にまとめてあり、次の2通りで実行できます。
+計算結果を scipy で求めた参照値と、AQL 表を MIL-STD-105E の写しから抽出した値（全セル）と照合します。照合ロジックは `tests/check.js` にまとめてあり、次の2通りで実行できます。
 
 ```
 node tests/test.js            # 不一致があれば終了コード 1

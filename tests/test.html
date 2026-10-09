@@ -13,16 +13,17 @@
 </style>
 </head>
 <body>
-<h1>計算ライブラリの照合（scipy 参照値・MIL-STD-105E 既知値）</h1>
+<h1>計算ライブラリの照合（scipy 参照値・MIL-STD-105E 原本）</h1>
 <p id="sum"></p>
 <table id="t"><thead><tr><th>種類</th><th>条件</th><th>計算値</th><th>参照値</th><th>結果</th></tr></thead><tbody></tbody></table>
 <script src="../js/aql-table.js"></script>
 <script src="../js/stats.js"></script>
 <script src="reference.js"></script>
+<script src="mil105e-legible.js"></script>
 <script src="check.js"></script>
 <script>
 // 照合ロジックは check.js（Node の test.js と共用）
-const rows = runChecks(window.SampStats, AQL_TABLE, REFERENCE);
+const rows = runChecks(window.SampStats, AQL_TABLE, REFERENCE, MIL105E_LEGIBLE);
 const fails = rows.filter(r => !r[4]).length;
 document.getElementById('sum').innerHTML = fails ? `<span class="ng">${fails} 件不一致</span> / ${rows.length} 件` : `<span class="ok">全 ${rows.length} 件一致</span>`;
 document.querySelector('#t tbody').innerHTML = rows.map(r => `<tr><td>${r[0]}</td><td>${r[1]}</td><td>${typeof r[2] === 'number' ? r[2].toPrecision(10) : r[2]}</td><td>${typeof r[3] === 'number' ? r[3].toPrecision(10) : r[3]}</td><td class="${r[4] ? 'ok' : 'ng'}">${r[4] ? '一致' : '不一致'}</td></tr>`).join('');
