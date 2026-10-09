@@ -1,5 +1,6 @@
-# scipy で参照値を作り tests/reference.js に書き出す（tests フォルダで実行: python make_reference.py）
+# scipy で参照値を作り tests/reference.js に書き出す（どのフォルダからでも実行可: python tests/make_reference.py）
 import json
+from pathlib import Path
 from scipy import stats
 from scipy.stats import beta
 cases = []
@@ -31,5 +32,8 @@ for (N,D,n,c) in [(1000,10,80,2),(500,25,50,0),(200,3,32,1),(10000,150,315,5)]:
     pmf=[float(stats.hypergeom.pmf(d,N,D,n)) for d in range(0,c+1)]
     pa=sum(pmf); esc=sum((D-d)*pmf[d] for d in range(c+1))
     cases.append(dict(kind='lot',N=N,D=D,n=n,c=c,pa=pa,find=float(1-stats.hypergeom.pmf(0,N,D,n)),esc=esc))
-open('reference.js','w').write('// scipy で計算した参照値（make_reference.py で再生成）\nconst REFERENCE = ' + json.dumps(cases, indent=1) + ';\n')
+(Path(__file__).parent / 'reference.js').write_text(
+    '// scipy で計算した参照値（make_reference.py で再生成）\nconst REFERENCE = ' + json.dumps(cases, indent=1) + ';\n'
+    "if (typeof module !== 'undefined') module.exports = REFERENCE;\n",
+    encoding='utf-8', newline='\n')
 print(len(cases))

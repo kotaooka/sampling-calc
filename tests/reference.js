@@ -226,3 +226,4 @@ const REFERENCE = [
   "esc": 97.45222333234447
  }
 ];
+if (typeof module !== 'undefined') module.exports = REFERENCE;

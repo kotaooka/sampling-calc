@@ -1,0 +1,20 @@
+# プッシュ時に計算ライブラリと AQL 表の照合テストを実行する
+name: test
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: コミット済みの参照値との照合
+        run: node tests/test.js
+      - run: pip install scipy
+      # 参照値を最新の scipy で作り直し、もう一度照合する（参照値ファイル自体の古さ・誤りも検出する）
+      - name: scipy で参照値を再生成して照合
+        run: python tests/make_reference.py && node tests/test.js

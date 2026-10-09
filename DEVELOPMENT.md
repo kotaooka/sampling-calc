@@ -14,7 +14,8 @@ icons/                アプリアイコン
 js/app.js             画面処理・グラフ描画
 js/stats.js           統計計算（外部ライブラリなし。Node でも読み込み可）
 js/aql-table.js       MIL-STD-105E の表データ
-tests/                計算の照合テスト
+tests/                計算の照合テスト（test.js / test.html / check.js / reference.js）
+.github/workflows/     push 時の自動テスト
 docs/screenshots/     README 用のスクリーンショット
 ```
 
@@ -45,4 +46,13 @@ docs/screenshots/     README 用のスクリーンショット
 
 ## テスト
 
-`tests/test.html` をブラウザで開くと、計算結果を scipy で求めた参照値と、AQL 表を既知の値と照合し、一致した件数を表示します。参照値は `tests/make_reference.py`（scipy が必要）で作り直せます。
+計算結果を scipy で求めた参照値と、AQL 表を既知の値と照合します。照合ロジックは `tests/check.js` にまとめてあり、次の2通りで実行できます。
+
+```
+node tests/test.js            # 不一致があれば終了コード 1
+python tests/make_reference.py  # 参照値 tests/reference.js を作り直す（scipy が必要）
+```
+
+`tests/test.html` をブラウザで開くと、同じ照合の結果を一覧で表示します。
+
+push すると GitHub Actions（`.github/workflows/test.yml`）で、コミット済みの参照値との照合と、最新の scipy で参照値を作り直したうえでの照合が自動で実行されます。
