@@ -18,11 +18,15 @@ tests/                計算の照合テスト（test.js / test.html / check.js 
 .github/workflows/     push 時の自動テスト
 docs/screenshots/     README 用のスクリーンショット
 tools/screenshots.py  スクリーンショットの撮影スクリプト
+tools/build.py        解説（docs/explanation.md）を index.html に埋め込む
+docs/explanation.md   「解説」タブの原稿
 ```
 
 ## 更新して公開するとき
 
 `index.html`・`js/`・`icons/` を変更したら、**`sw.js` 先頭の `VERSION` を必ず上げてから** push してください。上げないと、すでに使っている人の端末に古いファイルが残り続けます。
+
+解説を直すときは `docs/explanation.md` を編集し、`python tools/build.py`（`pip install markdown`）で index.html に埋め込んでください。埋め込み忘れは CI で検出します。解説に載せた計算例の数値は、計算の式を変えたら計算し直してください。
 
 画面の見た目を変えたときは、`docs/screenshots/` の画像も撮り直してください（README に載せています）。撮影は `tools/screenshots.py` で行います（準備手順はファイル先頭に記載）。Google Fonts が読めない状態で撮ると日本語が代替フォント（中国語字形など）で写るため、このスクリプトはフォントをローカルから読み込み、読めていなければ中断します。
 

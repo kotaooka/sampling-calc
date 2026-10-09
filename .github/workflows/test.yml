@@ -12,6 +12,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
+      - run: pip install markdown
+      - name: 解説（docs/explanation.md）の埋め込みが最新か
+        run: python tools/build.py && git diff --exit-code index.html
       - name: コミット済みの参照値との照合
         run: node tests/test.js
       - run: pip install scipy

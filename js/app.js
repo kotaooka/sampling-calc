@@ -277,7 +277,7 @@
   const OK = () => cssVar('--ok'), NG = () => cssVar('--ng');
 
   // ---------- 状態（URL に保存） ----------
-  const TABS = ['lot', 'aql', 'oc', 'design', 'est'];
+  const TABS = ['lot', 'aql', 'oc', 'design', 'est', 'explain'];
   const state = {
     tab: 'lot',
     lot: { N: 1000, p: 1, D: 10, mode: 'pct', n: 80, c: 2 },
@@ -326,7 +326,7 @@
 
   // ---------- タブ ----------
   const tabs = document.querySelectorAll('nav.tabs button');
-  const panels = { lot: $('p-lot'), aql: $('p-aql'), oc: $('p-oc'), design: $('p-design'), est: $('p-est') };
+  const panels = { lot: $('p-lot'), aql: $('p-aql'), oc: $('p-oc'), design: $('p-design'), est: $('p-est'), explain: $('p-explain') };
   function setTab(t) {
     state.tab = t;
     tabs.forEach(b => b.setAttribute('aria-selected', b.dataset.tab === t ? 'true' : 'false'));
