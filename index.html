@@ -5,6 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>抜取検査計算機</title>
 <meta name="description" content="ロットの合格確率、AQL方式、OC曲線、抜取方式の逆設計、不良率の区間推定を計算する">
+<link rel="canonical" href="https://kotaooka.github.io/sampling-calc/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="QC Workbench">
+<meta property="og:title" content="抜取検査計算機｜合格確率・AQL方式・OC曲線">
+<meta property="og:description" content="ロットの合格確率、AQL方式、OC曲線、抜取方式の逆設計、不良率の区間推定を計算する">
+<meta property="og:url" content="https://kotaooka.github.io/sampling-calc/">
+<meta property="og:image" content="https://kotaooka.github.io/sampling-calc/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="抜取検査計算機：合格確率、AQL表、OC曲線、逆設計、不良率の区間推定">
+<meta property="og:locale" content="ja_JP">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="theme-color" content="#1d5c96" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#11161b" media="(prefers-color-scheme: dark)">
 <link rel="manifest" href="manifest.webmanifest">
@@ -75,6 +87,10 @@ header.top {
 .brand { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
 .brand h1 { font-size: 1.15rem; margin: 0; letter-spacing: .02em; }
 .brand .std { font-size: .78rem; color: var(--muted); }
+/* QC Workbench へ戻るリンク（パンくず） */
+.brand .home { font-size: .78rem; color: var(--muted); text-decoration: none; margin-right: -6px; }
+.brand .home:hover { color: var(--accent); text-decoration: underline; }
+.brand .crumb { font-size: .78rem; color: var(--muted); margin-right: -6px; }
 nav.tabs { display: flex; gap: 4px; margin-top: 10px; overflow-x: auto; scrollbar-width: none; }
 nav.tabs::-webkit-scrollbar { display: none; }
 nav.tabs button {
@@ -220,7 +236,7 @@ footer.src a { color: var(--ink2); }
 <header class="top">
   <div class="top-in">
     <div class="brand">
-      <h1>抜取検査計算機</h1>
+      <a class="home" href="https://kotaooka.github.io/" title="QC Workbench（ツール一覧）へ戻る">QC Workbench</a><span class="crumb" aria-hidden="true">›</span><h1>抜取検査計算機</h1>
       <span class="std">計数値・一回抜取／AQL表は MIL-STD-105E 準拠</span>
     </div>
     <nav class="tabs" role="tablist" aria-label="計算の種類">
