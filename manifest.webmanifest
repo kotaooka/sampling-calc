@@ -1,0 +1,18 @@
+{
+  "name": "抜取検査計算機",
+  "short_name": "抜取検査",
+  "description": "ロットの合格確率、AQL方式（MIL-STD-105E）、OC曲線、抜取方式の逆設計、不良率の区間推定を計算する",
+  "lang": "ja",
+  "id": "./",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#eef1f4",
+  "theme_color": "#1d5c96",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

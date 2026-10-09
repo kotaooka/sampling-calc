@@ -1,0 +1,469 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>抜取検査計算機</title>
+<meta name="description" content="ロットの合格確率、AQL方式、OC曲線、抜取方式の逆設計、不良率の区間推定を計算する">
+<meta name="theme-color" content="#1d5c96" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#11161b" media="(prefers-color-scheme: dark)">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-title" content="抜取検査">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@400;700&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* レイアウト: 上部タブ + 入力（左）と結果（右）の2カラム。狭い画面では縦積み */
+:root {
+  --bg: #eef1f4;
+  --surface: #ffffff;
+  --ink: #15212c;
+  --ink2: #475563;
+  --muted: #74818e;
+  --line: #d5dce3;
+  --accent: #1d5c96;
+  --accent-ink: #ffffff;
+  --accent-weak: #e1ebf5;
+  --ok: #17703a;
+  --ok-weak: #e2f2e7;
+  --ng: #ad2a22;
+  --ng-weak: #f8e4e2;
+  --warn: #8a5300;
+  --warn-weak: #f8ecd9;
+  --s1: #2a78d6;
+  --s2: #eb6834;
+  --s3: #1baf7a;
+  --grid: #e4e9ee;
+  --f-ui: "BIZ UDPGothic", "Hiragino Sans", "Yu Gothic UI", "Meiryo", system-ui, sans-serif;
+  --f-num: "IBM Plex Mono", ui-monospace, "Consolas", monospace;
+  --r: 6px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #11161b; --surface: #19212a; --ink: #e6ecf2; --ink2: #a9b5c1; --muted: #7d8996;
+    --line: #2b3641; --accent: #6ba6df; --accent-ink: #0d1620; --accent-weak: #1c2f43;
+    --ok: #57c483; --ok-weak: #163222; --ng: #f07a70; --ng-weak: #3a1c1a; --warn: #e3a84e; --warn-weak: #36280f;
+    --s1: #3987e5; --s2: #d95926; --s3: #199e70; --grid: #253039;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #11161b; --surface: #19212a; --ink: #e6ecf2; --ink2: #a9b5c1; --muted: #7d8996;
+  --line: #2b3641; --accent: #6ba6df; --accent-ink: #0d1620; --accent-weak: #1c2f43;
+  --ok: #57c483; --ok-weak: #163222; --ng: #f07a70; --ng-weak: #3a1c1a; --warn: #e3a84e; --warn-weak: #36280f;
+  --s1: #3987e5; --s2: #d95926; --s3: #199e70; --grid: #253039;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { margin: 0; }
+body {
+  background: var(--bg); color: var(--ink);
+  font-family: var(--f-ui); font-size: 15px; line-height: 1.6;
+  -webkit-text-size-adjust: 100%;
+}
+.num, input[type="number"], .mono { font-family: var(--f-num); font-variant-numeric: tabular-nums; }
+.wrap { max-width: 1040px; margin: 0 auto; padding-inline: 16px; padding-block: 0 48px; }
+
+header.top {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5;
+  background: var(--bg); border-bottom: 1px solid var(--line);
+}
+.top-in { max-width: 1040px; margin: 0 auto; padding-inline: 16px; padding-block: 12px 0; }
+.brand { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.brand h1 { font-size: 1.15rem; margin: 0; letter-spacing: .02em; }
+.brand .std { font-size: .78rem; color: var(--muted); }
+nav.tabs { display: flex; gap: 4px; margin-top: 10px; overflow-x: auto; scrollbar-width: none; }
+nav.tabs::-webkit-scrollbar { display: none; }
+nav.tabs button {
+  flex: 0 0 auto; border: 0; background: none; color: var(--ink2);
+  font: inherit; font-size: .92rem; padding: 8px 12px 10px; cursor: pointer;
+  border-bottom: 3px solid transparent;
+}
+nav.tabs button[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--accent); font-weight: 700; }
+nav.tabs button:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+
+section.panel { display: grid; grid-template-columns: minmax(0, 300px) minmax(0, 1fr); gap: 20px; margin-top: 20px; }
+@media (max-width: 760px) { section.panel { grid-template-columns: minmax(0, 1fr); } }
+
+.box { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 16px; min-width: 0; }
+.inputs { display: flex; flex-direction: column; gap: 14px; align-self: start; }
+.field { display: flex; flex-direction: column; gap: 4px; }
+.field label, .lbl { font-size: .8rem; color: var(--ink2); letter-spacing: .03em; }
+.hint { font-size: .75rem; color: var(--muted); }
+input[type="number"], select {
+  width: 100%; font-size: 1rem; padding: 8px 10px; border-radius: var(--r);
+  border: 1px solid var(--line); background: var(--bg); color: var(--ink);
+}
+input:focus-visible, select:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.seg { display: flex; border: 1px solid var(--line); border-radius: var(--r); overflow: hidden; }
+.seg button {
+  flex: 1; border: 0; background: var(--bg); color: var(--ink2); font: inherit; font-size: .88rem;
+  padding: 8px 4px; cursor: pointer;
+}
+.seg button + button { border-left: 1px solid var(--line); }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); font-weight: 700; }
+.seg button:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+
+.results { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.verdict { padding: 18px 18px 16px; }
+.verdict .eyebrow { font-size: .78rem; color: var(--muted); letter-spacing: .04em; }
+.verdict .big { font-size: clamp(1.5rem, 4.6vw, 2.1rem); font-weight: 700; line-height: 1.3; margin: 2px 0 10px; text-wrap: balance; }
+.verdict .big .num { font-size: 1.12em; }
+.rules { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px; border-radius: 999px; font-size: .92rem; }
+.chip .num { font-size: 1.05rem; }
+.chip.ok { background: var(--ok-weak); color: var(--ok); }
+.chip.ng { background: var(--ng-weak); color: var(--ng); }
+.chip.warn { background: var(--warn-weak); color: var(--warn); }
+.chip .ic { font-weight: 700; }
+.note { font-size: .82rem; color: var(--ink2); margin: 10px 0 0; }
+.note.warn { color: var(--warn); }
+
+dl.kv { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px 18px; margin: 0; }
+dl.kv div { min-width: 0; }
+dl.kv dt { font-size: .75rem; color: var(--muted); letter-spacing: .03em; }
+dl.kv dd { margin: 0; font-size: 1.05rem; }
+dl.kv dd small { font-size: .78rem; color: var(--ink2); }
+
+.chart-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; margin-bottom: 6px; }
+.chart-head h2 { font-size: .95rem; margin: 0; }
+.chart-wrap { position: relative; }
+.chart-wrap svg { display: block; width: 100%; height: auto; touch-action: pan-y; }
+.tip {
+  position: absolute; pointer-events: none; background: var(--surface); border: 1px solid var(--line);
+  border-radius: var(--r); padding: 6px 9px; font-size: .78rem; box-shadow: 0 2px 10px rgba(0,0,0,.12);
+  white-space: nowrap; z-index: 2;
+}
+.tip .sw { display: inline-block; width: 10px; height: 3px; border-radius: 2px; margin-right: 6px; vertical-align: middle; }
+.legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: .8rem; color: var(--ink2); margin-top: 6px; }
+.legend span::before { content: ""; display: inline-block; width: 14px; height: 3px; border-radius: 2px; background: var(--c); margin-right: 6px; vertical-align: middle; }
+
+.btn {
+  font: inherit; font-size: .88rem; border: 1px solid var(--line); background: var(--surface); color: var(--ink);
+  border-radius: var(--r); padding: 7px 12px; cursor: pointer;
+}
+.btn:hover { border-color: var(--accent); }
+.btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.btn.small { font-size: .8rem; padding: 4px 9px; }
+.btnrow { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.scroll { overflow-x: auto; }
+table.t { border-collapse: collapse; width: 100%; font-size: .85rem; }
+table.t th, table.t td { padding: 6px 8px; border-bottom: 1px solid var(--line); text-align: right; white-space: nowrap; }
+table.t th { font-weight: 400; color: var(--muted); font-size: .75rem; }
+table.t th:first-child, table.t td:first-child { text-align: left; }
+table.t td.num { font-family: var(--f-num); }
+table.t tr.hit td { background: var(--accent-weak); }
+
+.plan-row { display: grid; grid-template-columns: 14px minmax(0,1.3fr) minmax(0,1.15fr) minmax(0,.8fr) auto; gap: 8px; align-items: end; }
+.plan-row .sw { width: 14px; height: 4px; border-radius: 2px; margin-bottom: 18px; }
+.plan-row .field label { font-size: .72rem; }
+.plan-row input { padding: 7px 6px; font-size: .95rem; }
+
+.toast { position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%);
+  background: var(--ink); color: var(--bg); padding: 8px 14px; border-radius: var(--r); font-size: .85rem; z-index: 9; }
+
+
+/* ---- グラフィカル部品 ---- */
+.viz { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.viz-title { font-size: .8rem; color: var(--ink2); display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.viz-title b { font-family: var(--f-num); font-weight: 500; color: var(--ink); font-size: .95rem; }
+.viz-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 18px 24px; }
+.split { display: flex; height: 40px; border-radius: var(--r); overflow: hidden; gap: 2px; background: var(--surface); }
+.split > div { display: flex; align-items: center; padding-inline: 10px; font-size: .85rem; font-weight: 700; white-space: nowrap; overflow: hidden; min-width: 0; }
+.split .ok { background: var(--ok); color: var(--surface); }
+.split .ng { background: var(--ng); color: var(--surface); justify-content: flex-end; }
+.split .warn { background: var(--warn); color: var(--surface); }
+.gauge { position: relative; height: 12px; }
+.gauge .track { position: absolute; inset: 0; background: var(--grid); border-radius: 6px; overflow: hidden; }
+.gauge .fill { height: 100%; background: var(--c, var(--accent)); border-radius: 6px 0 0 6px; }
+.gauge .tgt { position: absolute; top: -5px; bottom: -5px; width: 2px; background: var(--ink); border-radius: 1px; }
+.gauge-scale { display: flex; justify-content: space-between; font-size: .7rem; color: var(--muted); font-family: var(--f-num); }
+.lotbar { display: flex; height: 26px; border-radius: var(--r); overflow: hidden; gap: 2px; background: var(--surface); }
+.lotbar > div { min-width: 3px; display: flex; align-items: center; justify-content: center; font-size: .75rem; white-space: nowrap; overflow: hidden; }
+.lotbar .good { background: var(--grid); color: var(--ink2); }
+.lotbar .bad { background: var(--ng); color: var(--surface); }
+.lotbar .samp { background: var(--accent); color: var(--accent-ink); }
+.lotbar .rest { background: var(--grid); color: var(--ink2); }
+.key { display: flex; gap: 14px; flex-wrap: wrap; font-size: .75rem; color: var(--ink2); }
+.key span::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 2px; background: var(--c); margin-right: 5px; vertical-align: -1px; }
+.waffle { display: grid; grid-template-columns: repeat(10, 1fr); gap: 3px; width: min(220px, 100%); flex: 0 0 auto; }
+.waffle i { aspect-ratio: 1; border-radius: 2px; background: var(--ok); }
+.waffle i.r { background: var(--ng); }
+.jline { display: flex; gap: 3px; flex-wrap: wrap; }
+.jline span { min-width: 34px; height: 34px; padding-inline: 4px; display: flex; align-items: center; justify-content: center; border-radius: 4px; font-family: var(--f-num); font-size: .9rem; }
+.jline .ok { background: var(--ok-weak); color: var(--ok); }
+.jline .ng { background: var(--ng-weak); color: var(--ng); }
+.jline .warn { background: var(--warn-weak); color: var(--warn); }
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; }
+.tile { border-left: 3px solid var(--c, var(--line)); padding-left: 10px; min-width: 0; }
+.tile .k { font-size: .75rem; color: var(--muted); }
+.tile .v { font-family: var(--f-num); font-size: 1.35rem; line-height: 1.3; }
+.tile .v small { font-family: var(--f-ui); font-size: .75rem; color: var(--ink2); }
+.badges { display: flex; gap: 6px; flex-wrap: wrap; align-self: start; align-items: flex-start; }
+.badge { font-size: .75rem; padding: 2px 8px; border-radius: 4px; background: var(--accent-weak); color: var(--ink); }
+.badge b { font-family: var(--f-num); font-weight: 500; }
+.charts2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; }
+.charts2 h3 { font-size: .85rem; margin: 0 0 4px; font-weight: 700; }
+
+footer.src { margin-top: 28px; font-size: .75rem; color: var(--muted); line-height: 1.7; max-width: 72ch; }
+footer.src a { color: var(--ink2); }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="top-in">
+    <div class="brand">
+      <h1>抜取検査計算機</h1>
+      <span class="std">計数値・一回抜取／AQL表は MIL-STD-105E 準拠</span>
+    </div>
+    <nav class="tabs" role="tablist" aria-label="計算の種類">
+      <button role="tab" id="tab-lot" aria-controls="p-lot" data-tab="lot">合格率</button>
+      <button role="tab" id="tab-aql" aria-controls="p-aql" data-tab="aql">AQL方式</button>
+      <button role="tab" id="tab-oc" aria-controls="p-oc" data-tab="oc">OC曲線・比較</button>
+      <button role="tab" id="tab-design" aria-controls="p-design" data-tab="design">逆設計</button>
+      <button role="tab" id="tab-est" aria-controls="p-est" data-tab="est">不良率推定</button>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+<!-- ===== 合格率 ===== -->
+<section class="panel" id="p-lot" role="tabpanel" aria-labelledby="tab-lot">
+  <div class="box inputs">
+    <div class="field">
+      <label for="l-N">ロットサイズ N [個]</label>
+      <input type="number" id="l-N" min="1" step="1" value="1000" inputmode="numeric">
+    </div>
+    <div class="field">
+      <span class="lbl" id="l-mode-lbl">ロット内の不良の入れ方</span>
+      <div class="seg" role="group" aria-labelledby="l-mode-lbl" id="l-mode">
+        <button type="button" data-v="pct" aria-pressed="true">不良率 [%]</button>
+        <button type="button" data-v="cnt" aria-pressed="false">不良数 [個]</button>
+      </div>
+    </div>
+    <div class="field" id="l-p-field">
+      <label for="l-p">ロットの不良率 [%]</label>
+      <input type="number" id="l-p" min="0" max="100" step="any" value="1">
+    </div>
+    <div class="field" id="l-D-field" hidden>
+      <label for="l-D">ロット内の不良数 [個]</label>
+      <input type="number" id="l-D" min="0" step="1" value="10" inputmode="numeric">
+    </div>
+    <span class="hint" id="l-D-hint" style="margin-top:-8px"></span>
+    <div class="field">
+      <label for="l-n">抜き取り数 n [個]</label>
+      <input type="number" id="l-n" min="1" step="1" value="80" inputmode="numeric">
+    </div>
+    <div class="field">
+      <label for="l-c">合格とする不良数の上限 c [個]</label>
+      <input type="number" id="l-c" min="0" step="1" value="2" inputmode="numeric">
+      <span class="hint">抜き取った中の不良が c 個以下ならロット合格</span>
+    </div>
+    <div class="btnrow"><button class="btn small" id="l-from-aql" type="button">AQL方式の n・c を使う</button></div>
+  </div>
+  <div class="results">
+    <div class="box verdict" id="l-verdict"></div>
+    <div class="box viz" id="l-lot"></div>
+    <div class="box">
+      <div class="chart-head"><h2 id="l-dist-title">抜き取った中に入る不良の数</h2></div>
+      <div class="chart-wrap" id="l-dist"></div>
+      <div class="key" id="l-dist-key"></div>
+    </div>
+    <div class="box viz">
+      <div class="viz-title"><span>このロットを 100 回流した場合</span></div>
+      <div style="display:flex;gap:20px;flex-wrap:wrap;align-items:center">
+        <div class="waffle" id="l-waffle" aria-hidden="true"></div>
+        <div class="tiles" id="l-tiles" style="flex:1;min-width:200px"></div>
+      </div>
+      <div class="key"><span style="--c:var(--ok)">合格ロット</span><span style="--c:var(--ng)">不合格ロット</span></div>
+    </div>
+    <div class="box charts2">
+      <div><h3>ロットの不良率が違ったら</h3><div class="chart-wrap" id="l-oc"></div></div>
+      <div><h3>抜き取り数を変えたら</h3><div class="chart-wrap" id="l-nn"></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== AQL方式 ===== -->
+<section class="panel" id="p-aql" role="tabpanel" aria-labelledby="tab-aql" hidden>
+  <div class="box inputs">
+    <div class="field">
+      <label for="aql-N">ロットサイズ N</label>
+      <input type="number" id="aql-N" min="2" step="1" value="1000" inputmode="numeric">
+    </div>
+    <div class="field">
+      <label for="aql-level">検査水準</label>
+      <select id="aql-level">
+        <option>S-1</option><option>S-2</option><option>S-3</option><option>S-4</option>
+        <option>I</option><option selected>II</option><option>III</option>
+      </select>
+      <span class="hint">通常は II。S 系は破壊試験など検査数を抑えたいとき</span>
+    </div>
+    <div class="field">
+      <label for="aql-aql">AQL</label>
+      <select id="aql-aql"></select>
+      <span class="hint" id="aql-unit-hint"></span>
+    </div>
+    <div class="field">
+      <span class="lbl" id="aql-sev-lbl">検査の厳しさ</span>
+      <div class="seg" role="group" aria-labelledby="aql-sev-lbl" id="aql-sev">
+        <button type="button" data-v="normal" aria-pressed="true">なみ</button>
+        <button type="button" data-v="tightened" aria-pressed="false">きつい</button>
+        <button type="button" data-v="reduced" aria-pressed="false">ゆるい</button>
+      </div>
+    </div>
+  </div>
+  <div class="results">
+    <div class="box verdict" id="aql-verdict"></div>
+    <div class="box viz-grid" id="aql-viz"></div>
+    <div class="box">
+      <div class="chart-head">
+        <h2>OC曲線</h2>
+        <button class="btn small" id="aql-to-oc" type="button">OC比較に追加</button>
+      </div>
+      <div class="chart-wrap" id="aql-chart"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== OC曲線・比較 ===== -->
+<section class="panel" id="p-oc" role="tabpanel" aria-labelledby="tab-oc" hidden>
+  <div class="box inputs">
+    <div class="lbl">比較する方式（最大3つ）</div>
+    <div id="oc-plans" style="display:flex;flex-direction:column;gap:10px"></div>
+    <div class="btnrow"><button class="btn small" id="oc-add" type="button">方式を追加</button></div>
+    <div class="field">
+      <label for="oc-dist">確率分布</label>
+      <select id="oc-dist">
+        <option value="auto" selected>自動（n/N &gt; 0.1 なら超幾何）</option>
+        <option value="binomial">二項分布</option>
+        <option value="hypergeometric">超幾何分布（N 必須）</option>
+        <option value="poisson">ポアソン分布（欠点数）</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="oc-xmax">横軸の上限 不良率 [%]</label>
+      <input type="number" id="oc-xmax" min="0" step="any" placeholder="自動">
+    </div>
+  </div>
+  <div class="results">
+    <div class="box">
+      <div class="chart-head">
+        <div class="seg" role="group" aria-label="グラフの種類" id="oc-kind" style="min-width:220px">
+          <button type="button" data-v="oc" aria-pressed="true">OC</button>
+          <button type="button" data-v="aoq" aria-pressed="false">AOQ</button>
+          <button type="button" data-v="ati" aria-pressed="false">ATI</button>
+        </div>
+      </div>
+      <div class="chart-wrap" id="oc-chart"></div>
+      <div class="legend" id="oc-legend"></div>
+      <p class="note" id="oc-note"></p>
+    </div>
+    <div class="box">
+      <div class="chart-head"><h2>見分けられる品質の範囲</h2></div>
+      <div class="chart-wrap" id="oc-range"></div>
+      <div class="key" id="oc-range-key"></div>
+      <div class="btnrow" style="margin-top:12px">
+        <button class="btn small" id="oc-copy" type="button">曲線データをコピー（CSV）</button>
+        <button class="btn small dl-only" id="oc-csv" type="button">CSVを保存</button>
+        <button class="btn small dl-only" id="oc-png" type="button">グラフをPNGで保存</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 逆設計 ===== -->
+<section class="panel" id="p-design" role="tabpanel" aria-labelledby="tab-design" hidden>
+  <div class="box inputs">
+    <div class="lbl">合格させたい品質（生産者側）</div>
+    <div class="row2">
+      <div class="field"><label for="d-p1">不良率 p₁ [%]</label><input type="number" id="d-p1" value="1" min="0" step="any"></div>
+      <div class="field"><label for="d-a">生産者危険 α [%]</label><input type="number" id="d-a" value="5" min="0" max="100" step="any"></div>
+    </div>
+    <div class="lbl">不合格にしたい品質（消費者側）</div>
+    <div class="row2">
+      <div class="field"><label for="d-p2">不良率 p₂ [%]</label><input type="number" id="d-p2" value="5" min="0" step="any"></div>
+      <div class="field"><label for="d-b">消費者危険 β [%]</label><input type="number" id="d-b" value="10" min="0" max="100" step="any"></div>
+    </div>
+    <div class="field">
+      <label for="d-N">ロットサイズ N（任意）</label>
+      <input type="number" id="d-N" min="2" step="1" placeholder="空欄なら二項分布">
+      <span class="hint">入力すると超幾何分布で計算する</span>
+    </div>
+  </div>
+  <div class="results">
+    <div class="box verdict" id="d-verdict"></div>
+    <div class="box viz-grid" id="d-viz"></div>
+    <div class="box">
+      <div class="chart-head">
+        <h2>OC曲線と指定した2点</h2>
+        <button class="btn small" id="d-to-oc" type="button">OC比較に追加</button>
+      </div>
+      <div class="chart-wrap" id="d-chart"></div>
+      <div class="legend" id="d-legend"></div>
+    </div>
+    <div class="box">
+      <div class="chart-head"><h2>合格判定個数 c ごとの必要サンプル数</h2></div>
+      <div class="chart-wrap" id="d-bars"></div>
+      <div class="key"><span style="--c:var(--ok)">条件を満たす</span><span style="--c:var(--muted)">生産者危険が大きすぎる</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 不良率推定 ===== -->
+<section class="panel" id="p-est" role="tabpanel" aria-labelledby="tab-est" hidden>
+  <div class="box inputs">
+    <div class="row2">
+      <div class="field"><label for="e-n">検査数 n</label><input type="number" id="e-n" value="300" min="1" step="1"></div>
+      <div class="field"><label for="e-x">不良数 x</label><input type="number" id="e-x" value="0" min="0" step="1"></div>
+    </div>
+    <div class="field">
+      <span class="lbl" id="e-conf-lbl">信頼度</span>
+      <div class="seg" role="group" aria-labelledby="e-conf-lbl" id="e-conf">
+        <button type="button" data-v="0.9" aria-pressed="false">90 %</button>
+        <button type="button" data-v="0.95" aria-pressed="true">95 %</button>
+        <button type="button" data-v="0.99" aria-pressed="false">99 %</button>
+      </div>
+    </div>
+    <div class="field">
+      <label for="e-N">ロットサイズ N（任意）</label>
+      <input type="number" id="e-N" min="1" step="1" placeholder="例: 選別したロットの総数">
+      <span class="hint">入力するとロット内の不良数の上限も出す（超幾何分布）</span>
+    </div>
+  </div>
+  <div class="results">
+    <div class="box verdict" id="e-verdict"></div>
+    <div class="box viz">
+      <div class="viz-title"><span>不良率の推定範囲</span></div>
+      <div class="chart-wrap" id="e-range"></div>
+      <div class="key" id="e-range-key"></div>
+    </div>
+    <div class="box viz" id="e-lot" hidden></div>
+  </div>
+</section>
+
+<footer class="src">
+  AQL表の出典: MIL-STD-105E（1989-05-10）表I・表II-A/B/C、DTIC
+  <a href="https://apps.dtic.mil/sti/tr/pdf/ADA284013.pdf" target="_blank" rel="noopener">ADA284013</a>（Distribution Statement A）。
+  JIS Z 9015-1:2006（ISO 2859-1:1999）とは、ゆるい検査の方式と切替ルールが異なる。なみ・きつい検査の表を現行JISとして扱う場合は、JIS本文と照合すること。
+  AOQ・ATI は「不合格ロットを全数選別し、不良品を良品に置き換える」前提の値。区間推定は Clopper-Pearson 法（正確法）。
+  合格率タブは超幾何分布による厳密計算で、流出する不良は「不合格ロットは出荷しない」前提の値。
+</footer>
+</main>
+
+<div class="toast" id="toast" hidden></div>
+<textarea id="clip" style="position:fixed;left:-9999px;top:0" aria-hidden="true" tabindex="-1"></textarea>
+
+<script src="js/aql-table.js"></script>
+<script src="js/stats.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
