@@ -17,13 +17,14 @@ js/aql-table.js       MIL-STD-105E の表データ
 tests/                計算の照合テスト（test.js / test.html / check.js / reference.js）
 .github/workflows/     push 時の自動テスト
 docs/screenshots/     README 用のスクリーンショット
+tools/screenshots.py  スクリーンショットの撮影スクリプト
 ```
 
 ## 更新して公開するとき
 
 `index.html`・`js/`・`icons/` を変更したら、**`sw.js` 先頭の `VERSION` を必ず上げてから** push してください。上げないと、すでに使っている人の端末に古いファイルが残り続けます。
 
-画面の見た目を変えたときは、`docs/screenshots/` の画像も撮り直してください（README に載せています）。
+画面の見た目を変えたときは、`docs/screenshots/` の画像も撮り直してください（README に載せています）。撮影は `tools/screenshots.py` で行います（準備手順はファイル先頭に記載）。Google Fonts が読めない状態で撮ると日本語が代替フォント（中国語字形など）で写るため、このスクリプトはフォントをローカルから読み込み、読めていなければ中断します。
 
 ファイルを直接開いた場合（file://）はオフライン機能が動きません（計算は動きます）。
 
