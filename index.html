@@ -26,6 +26,10 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@400;700&family=IBM+Plex+Mono:wght@500&display=swap">
+<script>
+  // 保存したテーマ（auto / light / dark）を描画前に当てる
+  try { const t = localStorage.getItem("sampling-calc-theme"); if (t === "light" || t === "dark") document.documentElement.dataset.theme = t; } catch (e) { /* 保存できない環境 */ }
+</script>
 <style>
 /* レイアウト: 上部タブ + 入力（左）と結果（右）の2カラム。狭い画面では縦積み */
 :root {
@@ -91,6 +95,7 @@ header.top {
 .brand .home { font-size: .78rem; color: var(--muted); text-decoration: none; margin-right: -6px; }
 .brand .home:hover { color: var(--accent); text-decoration: underline; }
 .brand .crumb { font-size: .78rem; color: var(--muted); margin-right: -6px; }
+.brand .theme { margin-left: auto; }
 nav.tabs { display: flex; gap: 4px; margin-top: 10px; overflow-x: auto; scrollbar-width: none; }
 nav.tabs::-webkit-scrollbar { display: none; }
 nav.tabs button {
@@ -251,6 +256,7 @@ footer.src p { margin: 0 0 6px; }
     <div class="brand">
       <a class="home" href="https://kotaooka.github.io/" title="QC Workbench（ツール一覧）へ戻る">QC Workbench</a><span class="crumb" aria-hidden="true">›</span><h1>抜取検査計算機</h1>
       <span class="std">計数値・一回抜取／AQL表は MIL-STD-105E 準拠</span>
+      <button class="btn small theme" id="themeBtn" type="button" aria-label="表示テーマを切り替え">表示：自動</button>
     </div>
     <nav class="tabs" role="tablist" aria-label="計算の種類">
       <button role="tab" id="tab-lot" aria-controls="p-lot" data-tab="lot">合格率</button>
@@ -747,5 +753,23 @@ AOQ = Pa × p                      （N を入力しないとき）
 <script src="js/aql-table.js"></script>
 <script src="js/stats.js"></script>
 <script src="js/app.js"></script>
+<script>
+// 表示テーマ（自動 / ライト / ダーク）。グラフは data-theme の変化を見て描き直される
+(() => {
+  const THEMES = ['auto', 'light', 'dark'], LABEL = { auto: '表示：自動', light: '表示：ライト', dark: '表示：ダーク' };
+  const btn = document.getElementById('themeBtn');
+  let theme = document.documentElement.dataset.theme || 'auto';
+  const apply = t => {
+    if (t === 'auto') document.documentElement.removeAttribute('data-theme'); else document.documentElement.dataset.theme = t;
+    btn.textContent = LABEL[t];
+  };
+  btn.addEventListener('click', () => {
+    theme = THEMES[(THEMES.indexOf(theme) + 1) % THEMES.length];
+    try { localStorage.setItem('sampling-calc-theme', theme); } catch (e) { /* 保存できなくても切り替えは効く */ }
+    apply(theme);
+  });
+  apply(theme);
+})();
+</script>
 </body>
 </html>
