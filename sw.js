@@ -1,6 +1,6 @@
 // 抜取検査計算機の Service Worker
 // 公開ファイルを更新したら VERSION を上げる。古いキャッシュは activate 時に削除される
-const VERSION = 'v1.2.0';
+const VERSION = 'v1.2.1';
 const APP_CACHE = `sampling-calc-${VERSION}`;
 const FONT_CACHE = 'sampling-calc-fonts';
 

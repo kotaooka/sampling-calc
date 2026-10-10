@@ -27,8 +27,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@400;700&family=IBM+Plex+Mono:wght@500&display=swap">
 <script>
-  // 保存したテーマ（auto / light / dark）を描画前に当てる
-  try { const t = localStorage.getItem("sampling-calc-theme"); if (t === "light" || t === "dark") document.documentElement.dataset.theme = t; } catch (e) { /* 保存できない環境 */ }
+  // 保存したテーマ（auto / light / dark）を描画前に当てる。キーは QC Workbench の全ツールで共通（旧キーの値も読む）
+  try { const t = localStorage.getItem("qc-workbench-theme") ?? localStorage.getItem("sampling-calc-theme"); if (t === "light" || t === "dark") document.documentElement.dataset.theme = t; } catch (e) { /* 保存できない環境 */ }
 </script>
 <style>
 /* レイアウト: 上部タブ + 入力（左）と結果（右）の2カラム。狭い画面では縦積み */
@@ -758,16 +758,27 @@ AOQ = Pa × p                      （N を入力しないとき）
 (() => {
   const THEMES = ['auto', 'light', 'dark'], LABEL = { auto: '表示：自動', light: '表示：ライト', dark: '表示：ダーク' };
   const btn = document.getElementById('themeBtn');
-  let theme = document.documentElement.dataset.theme || 'auto';
+  // 表示テーマは QC Workbench の全ツールで共通のキーに保存する（旧キーの値は最初の1回だけ引き継ぐ）
+  const THEME_KEY = 'qc-workbench-theme', OLD_THEME_KEY = 'sampling-calc-theme';
+  const readTheme = () => {
+    try {
+      let t = localStorage.getItem(THEME_KEY);
+      if (t == null) { t = localStorage.getItem(OLD_THEME_KEY); if (THEMES.includes(t)) localStorage.setItem(THEME_KEY, t); }
+      return THEMES.includes(t) ? t : 'auto';
+    } catch (e) { return 'auto'; }
+  };
+  let theme = readTheme();
   const apply = t => {
     if (t === 'auto') document.documentElement.removeAttribute('data-theme'); else document.documentElement.dataset.theme = t;
     btn.textContent = LABEL[t];
   };
   btn.addEventListener('click', () => {
     theme = THEMES[(THEMES.indexOf(theme) + 1) % THEMES.length];
-    try { localStorage.setItem('sampling-calc-theme', theme); } catch (e) { /* 保存できなくても切り替えは効く */ }
+    try { localStorage.setItem(THEME_KEY, theme); } catch (e) { /* 保存できなくても切り替えは効く */ }
     apply(theme);
   });
+  // 別のタブや別のツールで切り替えたら、このページにも反映する
+  window.addEventListener('storage', e => { if (e.key === THEME_KEY || e.key === null) { theme = readTheme(); apply(theme); } });
   apply(theme);
 })();
 </script>
