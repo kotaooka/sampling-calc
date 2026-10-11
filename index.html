@@ -457,10 +457,22 @@ footer.src p { margin: 0 0 6px; }
 <!-- ===== 不良率推定 ===== -->
 <section class="panel" id="p-est" role="tabpanel" aria-labelledby="tab-est" hidden>
   <div class="box inputs">
-    <div class="row2">
+    <div class="field">
+      <span class="lbl" id="e-mode-lbl">求めるもの</span>
+      <div class="seg" role="group" aria-labelledby="e-mode-lbl" id="e-mode">
+        <button type="button" data-v="est" aria-pressed="true">不良率の範囲</button>
+        <button type="button" data-v="req" aria-pressed="false">必要な検査数</button>
+      </div>
+    </div>
+    <div class="row2" id="e-est-fields">
       <div class="field"><label for="e-n">検査数 n</label><input type="number" id="e-n" value="300" min="1" step="1"></div>
       <div class="field"><label for="e-x">不良数 x</label><input type="number" id="e-x" value="0" min="0" step="1"></div>
     </div>
+    <div class="row2" id="e-req-fields" hidden>
+      <div class="field"><label for="e-pu">不良率の上限 [%]</label><input type="number" id="e-pu" value="1" min="0" max="100" step="any"></div>
+      <div class="field"><label for="e-xa">許容する不良数 x</label><input type="number" id="e-xa" value="0" min="0" step="1"></div>
+    </div>
+    <span class="hint" id="e-req-hint" hidden style="margin-top:-8px">「不良率 1 % 以下を信頼度 95 % で示したい」なら 1 と 95 %。信頼性の言い方では 信頼度 R = 99 %、信頼水準 C = 95 % にあたる</span>
     <div class="field">
       <span class="lbl" id="e-conf-lbl">信頼度</span>
       <div class="seg" role="group" aria-labelledby="e-conf-lbl" id="e-conf">
@@ -477,10 +489,16 @@ footer.src p { margin: 0 0 6px; }
   </div>
   <div class="results">
     <div class="box verdict" id="e-verdict"></div>
-    <div class="box viz">
+    <div class="box viz" id="e-range-box">
       <div class="viz-title"><span>不良率の推定範囲</span></div>
       <div class="chart-wrap" id="e-range"></div>
       <div class="key" id="e-range-key"></div>
+    </div>
+    <div class="box viz" id="e-req-box" hidden>
+      <div class="viz-title"><span>許容する不良数ごとの必要な検査数</span></div>
+      <div class="chart-wrap" id="e-req-bars"></div>
+      <p class="note" id="e-req-note"></p>
+      <div class="btnrow" style="margin-top:8px"><button class="btn small" id="e-req-to-est" type="button">この検査数で不良率の範囲を見る</button></div>
     </div>
     <div class="box viz" id="e-lot" hidden></div>
   </div>
@@ -722,6 +740,17 @@ AOQ = Pa × p                      （N を入力しないとき）
 <pre><code>P(X ≤ x | D) ≥ 1 − 信頼度    を満たす最大の D
 </code></pre>
 <p>「ロットに不良が D 個あったら、抜き取りで x 個以下しか見つからない確率は 1 − 信頼度 未満になる」ので、それより多い不良はほぼありえない、という考え方です。例：N = 2,000 のうち 300 個を検査して不良 0 個なら、信頼度 95% でロットの不良は 18 個以下です。</p>
+<h3>必要な検査数（逆算）</h3>
+<p>「必要な検査数」に切り替えると、上の推定を逆にたどって、<strong>n 個を検査して不良が x 個以下なら「不良率は p_u 以下」と言える</strong>最小の n を求めます。</p>
+<pre><code>片側の上限 ≤ p_u   ⇔   P(X ≤ x | n, p_u) ≤ 1 − 信頼度    を満たす最小の n
+</code></pre>
+<p>P(X ≤ x | n, p_u) は二項分布の累積確率です。n が増えるほど小さくなるので、二分法で最小の n を探します。</p>
+<p>不良を 1 個も許容しない（x = 0）ときは、式を解いて</p>
+<pre><code>n = ln(1 − 信頼度) / ln(1 − p_u)    （切り上げ）
+</code></pre>
+<p>になります。信頼性の分野で success-run（ゼロ故障試験）と呼ばれる式と同じもので、信頼度 R = 1 − p_u、信頼水準 C = 信頼度 と読み替えれば一致します。例：p_u = 1 %、信頼度 95 % なら ln 0.05 / ln 0.99 = 298.1 → <strong>299 個</strong>。1 個まで許容するなら 473 個です。</p>
+<p>ロットサイズ N を入れると超幾何分布で計算し、「ロットの不良は floor(p_u × N) 個以下」と言える最小の n を求めます（上の「ロットの中の不良の個数の上限」の逆算）。例：N = 1,000、p_u = 1 %、信頼度 95 %、x = 0 なら 238 個で、ロットの不良は 10 個以下と言えます。</p>
+<p>許容する不良数を増やすと検査数は増えます。その代わり、工程の不良率が p_u よりかなり良いときに、たまたま 1 個出ただけで「言えない」となる確率が下がります。</p>
 <h2>数値計算の方法</h2>
 <ul>
 <li>組み合わせの数や確率は桁がとても大きく（小さく）なるので、すべて対数で計算します。log C(a, b) は対数ガンマ関数（Lanczos 近似）で求め、確率の足し合わせは指数の桁あふれが起きない方法（log-sum-exp）で行います。n が数万でも計算できます</li>

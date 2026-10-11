@@ -284,7 +284,7 @@
     aql: { N: 1000, lv: 'II', aql: '1.0', sev: 'normal' },
     oc: { plans: [{ N: 1000, n: 80, c: 2 }, { N: 1000, n: 125, c: 1 }, { N: 1000, n: 50, c: 0 }], dist: 'auto', kind: 'oc', xmax: '' },
     d: { p1: 1, a: 5, p2: 5, b: 10, N: '' },
-    e: { n: 300, x: 0, conf: 0.95, N: '' }
+    e: { n: 300, x: 0, conf: 0.95, N: '', mode: 'est', pu: 1, xa: 0 }
   };
   let ocIsExample = true;
 
@@ -296,7 +296,7 @@
       q.set('a', [state.aql.N, state.aql.lv, state.aql.aql, state.aql.sev].join('~'));
       q.set('o', state.oc.plans.map(p => [p.N || '', p.n, p.c].join('.')).join('_') + '~' + state.oc.dist + '~' + state.oc.kind + '~' + state.oc.xmax);
       q.set('d', [state.d.p1, state.d.a, state.d.p2, state.d.b, state.d.N].join('~'));
-      q.set('e', [state.e.n, state.e.x, state.e.conf, state.e.N].join('~'));
+      q.set('e', [state.e.n, state.e.x, state.e.conf, state.e.N, state.e.mode, state.e.pu, state.e.xa].join('~'));
       history.replaceState(null, '', '?' + q.toString() + '#' + state.tab);
     } catch (e) { /* 保存できない環境では何もしない */ }
   }
@@ -320,7 +320,10 @@
         state.oc.xmax = xmax || '';
       }
       if (q.get('d')) { const [p1, a, p2, b, N] = q.get('d').split('~'); Object.assign(state.d, { p1: +p1, a: +a, p2: +p2, b: +b, N: N || '' }); }
-      if (q.get('e')) { const [n, x, conf, N] = q.get('e').split('~'); Object.assign(state.e, { n: +n, x: +x, conf: [0.9, 0.95, 0.99].includes(+conf) ? +conf : 0.95, N: N || '' }); }
+      if (q.get('e')) {
+        const [n, x, conf, N, mode, pu, xa] = q.get('e').split('~');
+        Object.assign(state.e, { n: +n, x: +x, conf: [0.9, 0.95, 0.99].includes(+conf) ? +conf : 0.95, N: N || '', mode: mode === 'req' ? 'req' : 'est', pu: pu !== undefined && isFinite(+pu) ? +pu : 1, xa: xa !== undefined && isFinite(+xa) ? +xa : 0 });
+      }
     } catch (e) { /* 読めなければ初期値のまま */ }
   }
 
@@ -788,6 +791,10 @@
   // ---------- 不良率推定 ----------
   function renderEst() {
     const st = state.e;
+    const req = st.mode === 'req';
+    $('e-est-fields').hidden = req; $('e-req-fields').hidden = !req; $('e-req-hint').hidden = !req;
+    $('e-range-box').hidden = req; $('e-req-box').hidden = !req;
+    if (req) return renderReq();
     const n = Math.floor(st.n), x = Math.floor(st.x), conf = st.conf;
     const N = st.N === '' ? null : Math.floor(+st.N);
     const v = $('e-verdict'), lot = $('e-lot');
@@ -821,6 +828,72 @@
         <div class="key"><span style="--c:var(--accent)">検査済み</span><span style="--c:var(--grid)">未検査</span></div>`;
     } else lot.hidden = true;
   }
+  // 必要な検査数：「n 個検査して不良 x 個以下なら、不良率は pu 以下と言える」最小の n
+  let reqLast = null;
+  function renderReq() {
+    const st = state.e;
+    const pu = st.pu / 100, x = Math.floor(st.xa), conf = st.conf;
+    const N = st.N === '' ? null : Math.floor(+st.N);
+    const v = $('e-verdict'), lot = $('e-lot');
+    const err = msg => { errBox(v, msg); $('e-req-bars').innerHTML = ''; $('e-req-note').textContent = ''; lot.hidden = true; reqLast = null; };
+    if (!(pu > 0 && pu < 1)) return err('不良率の上限は 0〜100 % の間で入力する');
+    if (!(x >= 0) || !(st.xa === x)) return err('許容する不良数は 0 以上の整数で入力する');
+    if (N !== null && !(N >= 1)) return err('ロットサイズは 1 以上の整数で入力する');
+    const cs = Math.round(conf * 100);
+    const n = S.requiredSample(pu, x, conf, N);
+    const dist = N ? '超幾何分布' : '二項分布';
+    if (n === null) {
+      v.innerHTML = `<div class="eyebrow">条件を満たす検査数なし</div><div class="big">${N ? `ロット ${fmtInt(N)} 個を全数検査しても示せない` : '検査数が大きすぎる'}</div>
+        <p class="note">${N ? `ロットの不良が ${fmtInt(Math.floor(pu * N + 1e-9))} 個以下と言うには、許容する不良数を減らすか、不良率の上限を上げる。` : '不良率の上限を上げるか、許容する不良数を減らす。'}</p>`;
+      $('e-req-bars').innerHTML = ''; $('e-req-note').textContent = ''; lot.hidden = true; reqLast = null;
+    } else {
+      reqLast = { n, x };
+      let calc = '';
+      if (x === 0 && !N) {
+        const raw = Math.log(1 - conf) / Math.log(1 - pu);
+        calc = `<p class="note">不良 0 個なら n = ln(1 − ${cs} %) ÷ ln(1 − ${pct(pu)}) = ${raw.toFixed(1)} → 切り上げて ${fmtInt(n)} 個。</p>`;
+      }
+      v.innerHTML = `<div class="eyebrow">必要な検査数（${dist}、信頼度 ${cs} %）</div>
+        <div class="big">${num(fmtInt(n))} 個を検査する</div>
+        <div class="rules"><span class="chip ok"><span class="ic">✓</span>不良 ${num(x)} 個以下 → ${pct(pu)} 以下と言える</span><span class="chip ng"><span class="ic">✕</span>${num(x + 1)} 個以上 → 言えない</span></div>
+        ${calc}`;
+      // 許容する不良数ごとの必要数
+      const kMax = Math.min(12, Math.max(5, x + 2));
+      const bars = [];
+      for (let k = 0; k <= kMax; k++) {
+        const nk = S.requiredSample(pu, k, conf, N);
+        if (nk === null) break;
+        bars.push({
+          label: String(k), y: nk, color: k === x ? cssVar('--accent') : cssVar('--muted'),
+          tip: `<div>不良 ${k} 個まで許容：<b class="num">${fmtInt(nk)}</b> 個</div>`
+        });
+      }
+      const mx = Math.max(...bars.map(b => b.y));
+      drawBars($('e-req-bars'), {
+        bars, yMax: niceMax(mx * 1.15), yFmt: y => fmtInt(Math.round(y)), xTitle: '許容する不良数 x', yTitle: '必要な検査数 [個]',
+        showValues: () => true, valueFmt: y => fmtInt(y)
+      });
+      $('e-req-note').textContent = `許容する不良数を増やすほど検査数は増えるが、たまたま不良が出ただけで「言えない」になる心配は減る。`;
+      if (N) {
+        const Dmax = Math.floor(pu * N + 1e-9);
+        lot.hidden = false;
+        lot.innerHTML = `<div class="viz-title"><span>ロット ${fmtInt(N)} 個のうち検査する数</span><b>${pct(n / N)}</b></div>
+          ${lotBar([{ cls: 'samp', n, text: n / N >= 0.15 ? `検査 ${fmtInt(n)}` : '' }, { cls: 'rest', n: N - n, text: N - n > 0 ? `検査しない ${fmtInt(N - n)}` : '' }])}
+          <p class="note" style="margin-top:8px">合格（不良 ${fmtInt(x)} 個以下）なら、ロット全体の不良は ${fmtInt(Dmax)} 個以下（${pct(Dmax / N)}）と言える。</p>
+          <div class="key"><span style="--c:var(--accent)">検査</span><span style="--c:var(--grid)">検査しない</span></div>`;
+      } else lot.hidden = true;
+    }
+  }
+  $('e-req-to-est').addEventListener('click', () => {
+    if (!reqLast) return;
+    // 許容数ちょうどの不良が出た場合で見せる（最も厳しい結果でも上限を満たすことを確認できる）
+    Object.assign(state.e, { mode: 'est', n: reqLast.n, x: reqLast.x });
+    $('e-n').value = reqLast.n; $('e-x').value = reqLast.x;
+    syncEMode(); render();
+  });
+  $('e-pu').addEventListener('input', e => { state.e.pu = e.target.value === '' ? NaN : +e.target.value; render(); });
+  $('e-xa').addEventListener('input', e => { state.e.xa = e.target.value === '' ? NaN : +e.target.value; render(); });
+  const syncEMode = bindSeg('e-mode', () => state.e.mode, v => { state.e.mode = v; });
   $('e-n').addEventListener('input', e => { state.e.n = +e.target.value; render(); });
   $('e-x').addEventListener('input', e => { state.e.x = +e.target.value; render(); });
   $('e-N').addEventListener('input', e => { state.e.N = e.target.value; render(); });
@@ -842,7 +915,8 @@
     $('oc-dist').value = state.oc.dist; $('oc-xmax').value = state.oc.xmax;
     $('d-p1').value = state.d.p1; $('d-a').value = state.d.a; $('d-p2').value = state.d.p2; $('d-b').value = state.d.b; $('d-N').value = state.d.N;
     $('e-n').value = state.e.n; $('e-x').value = state.e.x; $('e-N').value = state.e.N;
-    syncSev(); syncKind(); syncConf();
+    $('e-pu').value = state.e.pu; $('e-xa').value = state.e.xa;
+    syncSev(); syncKind(); syncConf(); syncEMode();
     buildOcRows();
   }
   // テーマ切り替え時にグラフの色を描き直す

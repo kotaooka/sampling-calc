@@ -32,6 +32,11 @@
         ok = near(j.pa, r.pa, 1e-9) && near(j.pFindAny, r.find, 1e-9) && near(j.escapePerLot, r.esc, 1e-9);
         cond = `N=${r.N} D=${r.D} n=${r.n} c=${r.c}（合格確率/発見確率/流出不良）`;
       }
+      if (r.kind === 'req') {
+        const n = S.requiredSample(r.pu, r.x, r.conf, r.N);
+        got = n === null ? 'なし' : `n=${n}`; exp = r.n === null ? 'なし' : `n=${r.n}`; ok = got === exp;
+        cond = `不良率上限=${r.pu} 許容不良数=${r.x} 信頼度=${r.conf}${r.N ? ` N=${r.N}` : ''}`;
+      }
       // 未知の種類が混ざったら不一致として扱う（照合漏れを防ぐ）
       if (cond === undefined) { cond = JSON.stringify(r); got = '―'; exp = '―'; ok = false; }
       rows.push([r.kind, cond, got, exp, ok]);

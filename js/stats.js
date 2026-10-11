@@ -273,10 +273,44 @@
     return lo;
   }
 
+  // ---- 必要な検査数（不良率推定の逆算） ----
+  // 「n 個検査して不良 x 個以下なら、不良率は pu 以下と言える（信頼度 conf）」となる最小の n。
+  // N なし（二項）：片側上限 ≤ pu ⇔ P(X ≤ x | n, pu) ≤ 1 − conf
+  //   x = 0 なら n = ln(1 − conf) / ln(1 − pu) の切り上げ（success-run）
+  // N あり（超幾何）：ロットの不良数の上限（lotUpperDefects）≤ floor(pu·N)
+  //   ⇔ D* = floor(pu·N) + 1 個不良があるとき P(X ≤ x | D*) < 1 − conf
+  // 条件を満たす n がなければ null（N あり：n ≤ N の範囲、N なし：n ≤ 10,000,000）
+  function requiredSample(pu, x, conf, N) {
+    const a = 1 - conf;
+    if (!(pu > 0 && pu < 1) || !(x >= 0) || !(a > 0 && a < 1)) return null;
+    let ok, nMax;
+    if (N) {
+      const Dstar = Math.floor(pu * N + 1e-9) + 1;
+      if (Dstar > N) return null;
+      ok = n => hypergeomCdf(x, N, Dstar, n) < a;
+      nMax = N;
+    } else {
+      ok = n => binomCdf(x, n, pu) <= a;
+      nMax = 1e7;
+    }
+    // 単調（n が増えると P(X ≤ x) は減る）なので、倍々で上限を探してから二分法
+    let lo = x + 1, hi = x + 1;
+    if (lo > nMax) return null;
+    while (!ok(hi)) {
+      if (hi >= nMax) return null;
+      lo = hi + 1; hi = Math.min(nMax, hi * 2);
+    }
+    while (lo < hi) {
+      const mid = Math.floor((lo + hi) / 2);
+      if (ok(mid)) hi = mid; else lo = mid + 1;
+    }
+    return hi;
+  }
+
   const api = {
     lgamma, lchoose, binomCdf, hypergeomCdf, poissonCdf, hypergeomPmf, binomPmf, lotJudge, pAccept, autoDist,
     aoq, ati, pAtPa, curve, designPlan, zeroAcceptN, ibeta, ibetaInv,
-    clopperPearson, lotUpperDefects
+    clopperPearson, lotUpperDefects, requiredSample
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.SampStats = api;
