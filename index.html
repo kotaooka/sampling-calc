@@ -248,6 +248,10 @@ footer.src { margin-top: 28px; font-size: .75rem; color: var(--muted); line-heig
 footer.src a { color: var(--ink2); }
 footer.src p { margin: 0 0 6px; }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+
+/* 支援リンク（DESIGN.md 4章）：本文の文字色を引き継ぎ、印刷では隠す */
+.support a { color: inherit; white-space: nowrap; }
+@media print { .support { display: none !important; } }
 </style>
 </head>
 <body>
@@ -774,7 +778,7 @@ AOQ = Pa × p                      （N を入力しないとき）
   JIS Z 9015-1 とは、ゆるい検査の方式と切替ルールが異なります。なみ・きつい検査の表を現行JISとして扱う場合は、JIS本文と照合してください。
   AOQ・ATI は「不合格ロットを全数選別し、不良品を良品に置き換える」前提の値です。区間推定は Clopper-Pearson 法（正確法）です。
   合格率タブは超幾何分布による厳密計算で、流出する不良は「不合格ロットは出荷しない」前提の値です。</p>
-  <p><a href="https://github.com/kotaooka/sampling-calc">GitHub</a> ・ MIT License</p>
+  <p><a href="https://github.com/kotaooka/sampling-calc">GitHub</a> ・ MIT License<span class="support"> ・ <a href="https://buymeacoffee.com/kotaooka" target="_blank" rel="noopener"><span aria-hidden="true">☕</span> 開発を応援する（Buy Me a Coffee）</a></span></p>
 </footer>
 </main>
 
