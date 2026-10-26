@@ -5,8 +5,8 @@
 **https://kotaooka.github.io/sampling-calc/**
 
 - ブラウザだけで動きます。インストールやユーザー登録は不要です
-- 入力した数値はお使いの端末の中だけで計算し、外部には送信しません
-- 画面の字体（BIZ UDPゴシック・IBM Plex Mono）は Google Fonts から読み込むため、開いたときに Google のサーバーへ接続します。入力した数値は送りません
+- **入力したデータやファイルは、この端末の外に送りません**。計算はすべてブラウザの中で行います
+- 画面の字体（BIZ UDPゴシック・IBM Plex Mono）は Google Fonts から読み込むため、開いたときに Google のサーバーへ接続します
 - スマホ・タブレット・PC のどれでも使えます
 
 <p align="center"><img src="docs/screenshots/mobile.png" width="300" alt="スマホでの表示（合格率タブ）"></p>
