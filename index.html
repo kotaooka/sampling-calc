@@ -74,7 +74,7 @@
 }
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
-html, body { margin: 0; }
+html, body { text-autospace: normal; margin: 0; }
 body {
   background: var(--bg); color: var(--ink);
   font-family: var(--f-ui); font-size: 15px; line-height: 1.6;
@@ -244,9 +244,9 @@ section.panel-explain { margin-top: 20px; }
 .explain th, .explain td { border: 1px solid var(--line); padding: 5px 10px; text-align: left; vertical-align: top; }
 .explain th { background: var(--bg); color: var(--ink2); }
 .explain ul, .explain ol { padding-left: 1.4em; }
-footer.src { margin-top: 28px; font-size: .75rem; color: var(--muted); line-height: 1.7; max-width: 72ch; }
-footer.src a { color: var(--ink2); }
-footer.src p { margin: 0 0 6px; }
+.src { margin-top: 28px; font-size: .75rem; color: var(--muted); line-height: 1.7; max-width: 72ch; }
+.src a { color: var(--ink2); }
+.src p { margin: 0 0 6px; }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 
 /* 支援リンク（DESIGN.md 4章）：本文の文字色を引き継ぎ、印刷では隠す */
@@ -259,7 +259,7 @@ footer.src p { margin: 0 0 6px; }
   <div class="top-in">
     <div class="brand">
       <a class="home" href="https://kotaooka.github.io/" title="QC Workbench（ツール一覧）へ戻る">QC Workbench</a><span class="crumb" aria-hidden="true">›</span><h1>抜取検査計算機</h1>
-      <span class="std">計数値・一回抜取／AQL表は MIL-STD-105E 準拠</span>
+      <span class="std">計数値・一回抜取／AQL表はMIL-STD-105E準拠</span>
       <button class="btn small theme" id="themeBtn" type="button" aria-label="表示テーマを切り替え">表示：自動</button>
     </div>
     <nav class="tabs" role="tablist" aria-label="計算の種類">
@@ -279,7 +279,7 @@ footer.src p { margin: 0 0 6px; }
 <section class="panel" id="p-lot" role="tabpanel" aria-labelledby="tab-lot">
   <div class="box inputs">
     <div class="field">
-      <label for="l-N">ロットサイズ N [個]</label>
+      <label for="l-N">ロットサイズN [個]</label>
       <input type="number" id="l-N" min="1" step="1" value="1000" inputmode="numeric">
     </div>
     <div class="field">
@@ -299,15 +299,15 @@ footer.src p { margin: 0 0 6px; }
     </div>
     <span class="hint" id="l-D-hint" style="margin-top:-8px"></span>
     <div class="field">
-      <label for="l-n">抜き取り数 n [個]</label>
+      <label for="l-n">抜き取り数n [個]</label>
       <input type="number" id="l-n" min="1" step="1" value="80" inputmode="numeric">
     </div>
     <div class="field">
-      <label for="l-c">合格とする不良数の上限 c [個]</label>
+      <label for="l-c">合格とする不良数の上限c [個]</label>
       <input type="number" id="l-c" min="0" step="1" value="2" inputmode="numeric">
-      <span class="hint">抜き取った中の不良が c 個以下ならロット合格</span>
+      <span class="hint">抜き取った中の不良がc個以下ならロット合格</span>
     </div>
-    <div class="btnrow"><button class="btn small" id="l-from-aql" type="button">AQL方式の n・c を使う</button></div>
+    <div class="btnrow"><button class="btn small" id="l-from-aql" type="button">AQL方式のn・cを使う</button></div>
   </div>
   <div class="results">
     <div class="box verdict" id="l-verdict"></div>
@@ -318,7 +318,7 @@ footer.src p { margin: 0 0 6px; }
       <div class="key" id="l-dist-key"></div>
     </div>
     <div class="box viz">
-      <div class="viz-title"><span>このロットを 100 回流した場合</span></div>
+      <div class="viz-title"><span>このロットを100回流した場合</span></div>
       <div style="display:flex;gap:20px;flex-wrap:wrap;align-items:center">
         <div class="waffle" id="l-waffle" aria-hidden="true"></div>
         <div class="tiles" id="l-tiles" style="flex:1;min-width:200px"></div>
@@ -336,7 +336,7 @@ footer.src p { margin: 0 0 6px; }
 <section class="panel" id="p-aql" role="tabpanel" aria-labelledby="tab-aql" hidden>
   <div class="box inputs">
     <div class="field">
-      <label for="aql-N">ロットサイズ N</label>
+      <label for="aql-N">ロットサイズN</label>
       <input type="number" id="aql-N" min="2" step="1" value="1000" inputmode="numeric">
     </div>
     <div class="field">
@@ -345,7 +345,7 @@ footer.src p { margin: 0 0 6px; }
         <option>S-1</option><option>S-2</option><option>S-3</option><option>S-4</option>
         <option>I</option><option selected>II</option><option>III</option>
       </select>
-      <span class="hint">通常は II。S 系は破壊試験など検査数を抑えたいとき</span>
+      <span class="hint">通常はII。S系は破壊試験など検査数を抑えたいとき</span>
     </div>
     <div class="field">
       <label for="aql-aql">AQL</label>
@@ -383,9 +383,9 @@ footer.src p { margin: 0 0 6px; }
     <div class="field">
       <label for="oc-dist">確率分布</label>
       <select id="oc-dist">
-        <option value="auto" selected>自動（n/N &gt; 0.1 なら超幾何）</option>
+        <option value="auto" selected>自動（n/N &gt; 0.1なら超幾何）</option>
         <option value="binomial">二項分布</option>
-        <option value="hypergeometric">超幾何分布（N 必須）</option>
+        <option value="hypergeometric">超幾何分布（N必須）</option>
         <option value="poisson">ポアソン分布（欠点数）</option>
       </select>
     </div>
@@ -425,16 +425,16 @@ footer.src p { margin: 0 0 6px; }
   <div class="box inputs">
     <div class="lbl">合格させたい品質（生産者側）</div>
     <div class="row2">
-      <div class="field"><label for="d-p1">不良率 p₁ [%]</label><input type="number" id="d-p1" value="1" min="0" step="any"></div>
-      <div class="field"><label for="d-a">生産者危険 α [%]</label><input type="number" id="d-a" value="5" min="0" max="100" step="any"></div>
+      <div class="field"><label for="d-p1">不良率p₁ [%]</label><input type="number" id="d-p1" value="1" min="0" step="any"></div>
+      <div class="field"><label for="d-a">生産者危険α [%]</label><input type="number" id="d-a" value="5" min="0" max="100" step="any"></div>
     </div>
     <div class="lbl">不合格にしたい品質（消費者側）</div>
     <div class="row2">
-      <div class="field"><label for="d-p2">不良率 p₂ [%]</label><input type="number" id="d-p2" value="5" min="0" step="any"></div>
-      <div class="field"><label for="d-b">消費者危険 β [%]</label><input type="number" id="d-b" value="10" min="0" max="100" step="any"></div>
+      <div class="field"><label for="d-p2">不良率p₂ [%]</label><input type="number" id="d-p2" value="5" min="0" step="any"></div>
+      <div class="field"><label for="d-b">消費者危険β [%]</label><input type="number" id="d-b" value="10" min="0" max="100" step="any"></div>
     </div>
     <div class="field">
-      <label for="d-N">ロットサイズ N（任意）</label>
+      <label for="d-N">ロットサイズN（任意）</label>
       <input type="number" id="d-N" min="2" step="1" placeholder="空欄なら二項分布">
       <span class="hint">入力すると超幾何分布で計算する</span>
     </div>
@@ -451,7 +451,7 @@ footer.src p { margin: 0 0 6px; }
       <div class="legend" id="d-legend"></div>
     </div>
     <div class="box">
-      <div class="chart-head"><h2>合格判定個数 c ごとの必要サンプル数</h2></div>
+      <div class="chart-head"><h2>合格判定個数cごとの必要サンプル数</h2></div>
       <div class="chart-wrap" id="d-bars"></div>
       <div class="key"><span style="--c:var(--ok)">条件を満たす</span><span style="--c:var(--muted)">生産者危険が大きすぎる</span></div>
     </div>
@@ -469,14 +469,14 @@ footer.src p { margin: 0 0 6px; }
       </div>
     </div>
     <div class="row2" id="e-est-fields">
-      <div class="field"><label for="e-n">検査数 n</label><input type="number" id="e-n" value="300" min="1" step="1"></div>
-      <div class="field"><label for="e-x">不良数 x</label><input type="number" id="e-x" value="0" min="0" step="1"></div>
+      <div class="field"><label for="e-n">検査数n</label><input type="number" id="e-n" value="300" min="1" step="1"></div>
+      <div class="field"><label for="e-x">不良数x</label><input type="number" id="e-x" value="0" min="0" step="1"></div>
     </div>
     <div class="row2" id="e-req-fields" hidden>
       <div class="field"><label for="e-pu">不良率の上限 [%]</label><input type="number" id="e-pu" value="1" min="0" max="100" step="any"></div>
-      <div class="field"><label for="e-xa">許容する不良数 x</label><input type="number" id="e-xa" value="0" min="0" step="1"></div>
+      <div class="field"><label for="e-xa">許容する不良数x</label><input type="number" id="e-xa" value="0" min="0" step="1"></div>
     </div>
-    <span class="hint" id="e-req-hint" hidden style="margin-top:-8px">「不良率 1 % 以下を信頼度 95 % で示したい」なら 1 と 95 %。信頼性の言い方では 信頼度 R = 99 %、信頼水準 C = 95 % にあたる</span>
+    <span class="hint" id="e-req-hint" hidden style="margin-top:-8px">「不良率1 %以下を信頼度95 %で示したい」なら1と95 %。信頼性の言い方では 信頼度R = 99 %、信頼水準C = 95 %にあたる</span>
     <div class="field">
       <span class="lbl" id="e-conf-lbl">信頼度</span>
       <div class="seg" role="group" aria-labelledby="e-conf-lbl" id="e-conf">
@@ -486,7 +486,7 @@ footer.src p { margin: 0 0 6px; }
       </div>
     </div>
     <div class="field">
-      <label for="e-N">ロットサイズ N（任意）</label>
+      <label for="e-N">ロットサイズN（任意）</label>
       <input type="number" id="e-N" min="1" step="1" placeholder="例: 選別したロットの総数">
       <span class="hint">入力するとロット内の不良数の上限も出す（超幾何分布）</span>
     </div>
@@ -508,12 +508,12 @@ footer.src p { margin: 0 0 6px; }
   </div>
 </section>
 
-<!-- ===== 解説（docs/explanation.md から tools/build.py で埋め込む） ===== -->
+<!-- ===== 解説（docs/explanation.mdからtools/build.pyで埋め込む） ===== -->
 <section class="panel-explain" id="p-explain" role="tabpanel" aria-labelledby="tab-explain" hidden>
   <div class="box explain">
 <!--EXPLAIN-START-->
 <h1>計算の解説</h1>
-<p>このツールの各タブが、どの式で何を計算しているかをまとめます。対象は<strong>計数値の一回抜取検査</strong>です。ロットから n 個を抜き取り、その中の不良（または欠点）が c 個以下ならロットを合格、それより多ければ不合格とします。</p>
+<p>このツールの各タブが、どの式で何を計算しているかをまとめます。対象は<strong>計数値の一回抜取検査</strong>です。ロットからn個を抜き取り、その中の不良（または欠点）がc個以下ならロットを合格、それより多ければ不合格とします。</p>
 <h2>記号</h2>
 <table>
 <thead>
@@ -533,11 +533,11 @@ footer.src p { margin: 0 0 6px; }
 </tr>
 <tr>
 <td>c（Ac）</td>
-<td>合格判定個数。抜き取った中の不良が c 個以下なら合格</td>
+<td>合格判定個数。抜き取った中の不良がc個以下なら合格</td>
 </tr>
 <tr>
 <td>Re</td>
-<td>不合格判定個数。Re 個以上なら不合格（一回抜取のなみ検査では Re = c + 1）</td>
+<td>不合格判定個数。Re個以上なら不合格（一回抜取のなみ検査ではRe = c + 1）</td>
 </tr>
 <tr>
 <td>D</td>
@@ -545,11 +545,11 @@ footer.src p { margin: 0 0 6px; }
 </tr>
 <tr>
 <td>p</td>
-<td>ロットの不良率（= D / N）。欠点数で扱うときは 1 単位あたりの欠点数</td>
+<td>ロットの不良率（= D / N）。欠点数で扱うときは1単位あたりの欠点数</td>
 </tr>
 <tr>
 <td>X</td>
-<td>抜き取った n 個の中の不良の個数（確率的に変わる）</td>
+<td>抜き取ったn個の中の不良の個数（確率的に変わる）</td>
 </tr>
 <tr>
 <td>Pa</td>
@@ -566,29 +566,29 @@ footer.src p { margin: 0 0 6px; }
 </tbody>
 </table>
 <h2>抜き取った中の不良の数の分布</h2>
-<p>抜取検査の計算はすべて「X がどの値をどのくらいの確率でとるか」から始まります。ロットとサンプルの条件によって、次の 3 つの分布を使い分けます。</p>
+<p>抜取検査の計算はすべて「Xがどの値をどのくらいの確率でとるか」から始まります。ロットとサンプルの条件によって、次の3つの分布を使い分けます。</p>
 <h3>超幾何分布（ロットの大きさを考える厳密な計算）</h3>
-<p>不良 D 個を含む N 個のロットから、戻さずに n 個を抜き取ったとき、不良がちょうど d 個入る確率です。</p>
+<p>不良D個を含むN個のロットから、戻さずにn個を抜き取ったとき、不良がちょうどd個入る確率です。</p>
 <pre><code>P(X = d) = C(D, d) × C(N − D, n − d) / C(N, n)
 </code></pre>
-<p>C(a, b) は a 個から b 個を選ぶ組み合わせの数です。分子は「不良 D 個から d 個、良品 N − D 個から n − d 個を選ぶ選び方」、分母は「N 個から n 個を選ぶ選び方」です。</p>
+<p>C(a, b) はa個からb個を選ぶ組み合わせの数です。分子は「不良D個からd個、良品N − D個からn − d個を選ぶ選び方」、分母は「N個からn個を選ぶ選び方」です。</p>
 <h3>二項分布（ロットが十分大きいときの近似）</h3>
-<p>ロットが抜き取り数に比べて十分大きいと、1 個抜いても残りの不良率はほとんど変わりません。このとき、1 個ずつ独立に確率 p で不良が出ると考えられます。</p>
+<p>ロットが抜き取り数に比べて十分大きいと、1個抜いても残りの不良率はほとんど変わりません。このとき、1個ずつ独立に確率pで不良が出ると考えられます。</p>
 <pre><code>P(X = d) = C(n, d) × p^d × (1 − p)^(n − d)
 </code></pre>
 <p>ロットサイズが分からない場合や、工程から流れてくる製品のように「ロットの外にも同じ品質のものが続く」場合にも、この式を使います。</p>
 <h3>ポアソン分布（欠点数を数えるとき）</h3>
-<p>1 個の中に欠点がいくつもありうる場合（傷の数、はんだ付けの不良箇所の数など）は、「100 単位あたりの欠点数」で品質を表します。1 単位あたりの欠点数を p とすると、n 単位の中の欠点数は平均 λ = n × p のポアソン分布に従います。</p>
+<p>1個の中に欠点がいくつもありうる場合（傷の数、はんだ付けの不良箇所の数など）は、「100単位あたりの欠点数」で品質を表します。1単位あたりの欠点数をpとすると、n単位の中の欠点数は平均λ = n × pのポアソン分布に従います。</p>
 <pre><code>P(X = d) = e^(−λ) × λ^d / d!
 </code></pre>
 <h3>合格確率と分布の自動選択</h3>
-<p>どの分布でも、合格確率は c 個以下になる確率の合計です。</p>
+<p>どの分布でも、合格確率はc個以下になる確率の合計です。</p>
 <pre><code>Pa = P(X = 0) + P(X = 1) + … + P(X = c)
 </code></pre>
-<p>「OC曲線・比較」タブの「自動」では、ロットサイズ N が入力されていて n / N が 0.1 を超えるとき超幾何分布、それ以外は二項分布を使います。AQL方式タブで AQL が 10 を超える場合は、欠点数とみなしてポアソン分布を使います。</p>
-<p><strong>二項分布の近似の影響の例</strong>：N = 1,000、不良率 1%（D = 10）、n = 80、c = 2 の合格確率は、超幾何分布で 96.08%、二項分布で 95.34% です（n / N = 0.08）。ロットが小さいほど、抜き取ったぶんだけ残りの不良率が下がるので、超幾何分布の方が合格確率は高めに出ます。</p>
+<p>「OC曲線・比較」タブの「自動」では、ロットサイズNが入力されていてn / Nが0.1を超えるとき超幾何分布、それ以外は二項分布を使います。AQL方式タブでAQLが10を超える場合は、欠点数とみなしてポアソン分布を使います。</p>
+<p><strong>二項分布の近似の影響の例</strong>：N = 1,000、不良率1%（D = 10）、n = 80、c = 2の合格確率は、超幾何分布で96.08%、二項分布で95.34%です（n / N = 0.08）。ロットが小さいほど、抜き取ったぶんだけ残りの不良率が下がるので、超幾何分布の方が合格確率は高めに出ます。</p>
 <h2>合格率タブ</h2>
-<p>ロットの中の不良の個数 D が決まっているとして、<strong>超幾何分布で厳密に</strong>計算します。不良率で入力したときは、D = 不良率 × N を四捨五入して整数にします。</p>
+<p>ロットの中の不良の個数Dが決まっているとして、<strong>超幾何分布で厳密に</strong>計算します。不良率で入力したときは、D = 不良率 × Nを四捨五入して整数にします。</p>
 <table>
 <thead>
 <tr>
@@ -603,94 +603,94 @@ footer.src p { margin: 0 0 6px; }
 </tr>
 <tr>
 <td>抜き取った中の不良の数（グラフ）</td>
-<td>P(X = d)。c 以下が合格、c + 1 以上が不合格</td>
+<td>P(X = d)。c以下が合格、c + 1以上が不合格</td>
 </tr>
 <tr>
 <td>不良の数の平均</td>
 <td>n × D / N</td>
 </tr>
 <tr>
-<td>不良を 1 個以上見つける確率</td>
+<td>不良を1個以上見つける確率</td>
 <td>1 − P(X = 0)</td>
 </tr>
 <tr>
-<td>合格ロットに残る不良（1 ロット平均）</td>
+<td>合格ロットに残る不良（1ロット平均）</td>
 <td>Σ(d = 0〜c) (D − d) × P(X = d) ÷ Pa</td>
 </tr>
 <tr>
-<td>100 ロットで流出する不良（合計）</td>
+<td>100ロットで流出する不良（合計）</td>
 <td>100 × Σ(d = 0〜c) (D − d) × P(X = d)</td>
 </tr>
 </tbody>
 </table>
-<p>流出する不良は「不合格のロットは出荷しない」前提の値です。合格したロットでは、抜き取って見つけた d 個の不良は除き、残りの D − d 個がそのまま出荷されると考えます。</p>
-<p><strong>計算例（初期値）</strong>：N = 1,000、不良率 1%（D = 10）、n = 80、c = 2</p>
+<p>流出する不良は「不合格のロットは出荷しない」前提の値です。合格したロットでは、抜き取って見つけたd個の不良は除き、残りのD − d個がそのまま出荷されると考えます。</p>
+<p><strong>計算例（初期値）</strong>：N = 1,000、不良率1%（D = 10）、n = 80、c = 2</p>
 <ul>
-<li>合格確率 Pa = 96.08%</li>
-<li>不良を 1 個以上見つける確率 = 56.73%（4 割強のロットでは、抜き取りの中に不良が 1 個も入らない）</li>
-<li>合格ロットに残る不良は平均 9.30 個、100 ロットでは合計 893 個が流出する</li>
+<li>合格確率Pa = 96.08%</li>
+<li>不良を1個以上見つける確率 = 56.73%（4割強のロットでは、抜き取りの中に不良が1個も入らない）</li>
+<li>合格ロットに残る不良は平均9.30個、100ロットでは合計893個が流出する</li>
 </ul>
 <p>抜取検査はロットの合否を決める仕組みで、不良品を取り除く仕組みではないことが数字で分かります。</p>
 <h2>AQL方式タブ</h2>
-<p>MIL-STD-105E の表から、一回抜取方式（n, Ac, Re）を読み取ります。</p>
+<p>MIL-STD-105Eの表から、一回抜取方式（n, Ac, Re）を読み取ります。</p>
 <ol>
-<li><strong>表I</strong>：ロットサイズ N と検査水準（通常は II）から、サンプル文字（A〜R）を決める</li>
-<li><strong>表II-A/B/C</strong>（なみ・きつい・ゆるい検査）：サンプル文字の行と AQL の列が交わるセルから、n・Ac・Re を読む</li>
-<li>セルが矢印のときは、矢印の先の最初の方式（サンプル文字）を使い、n もその行の値にする。画面では「矢印で ○ に変更」と表示する</li>
+<li><strong>表I</strong>：ロットサイズNと検査水準（通常はII）から、サンプル文字（A〜R）を決める</li>
+<li><strong>表II-A/B/C</strong>（なみ・きつい・ゆるい検査）：サンプル文字の行とAQLの列が交わるセルから、n・Ac・Reを読む</li>
+<li>セルが矢印のときは、矢印の先の最初の方式（サンプル文字）を使い、nもその行の値にする。画面では「矢印で ○ に変更」と表示する</li>
 <li>表のサンプル数がロットサイズ以上になるときは全数検査とする</li>
 </ol>
-<p>ゆるい検査では Ac と Re の間に差がある方式があります（例：Ac = 1、Re = 3）。不良が Ac を超えて Re 未満のときは、ロットは合格とし、次のロットからなみ検査に戻すのが MIL-STD-105E の規定です。なみ・きつい・ゆるいの切替（何ロット連続で合格したら、など）の判断は、このツールでは行いません。</p>
-<p>画面の OC 曲線と次の値は、読み取った方式（n, c）を上の分布で計算したものです。</p>
+<p>ゆるい検査ではAcとReの間に差がある方式があります（例：Ac = 1、Re = 3）。不良がAcを超えてRe未満のときは、ロットは合格とし、次のロットからなみ検査に戻すのがMIL-STD-105Eの規定です。なみ・きつい・ゆるいの切替（何ロット連続で合格したら、など）の判断は、このツールでは行いません。</p>
+<p>画面のOC曲線と次の値は、読み取った方式（n, c）を上の分布で計算したものです。</p>
 <ul>
-<li><strong>品質がちょうど AQL のロットが合格する確率</strong>：Pa(p = AQL)</li>
-<li>合格確率が 95%・50%・10% になる不良率（下の「見分けられる品質の範囲」と同じ）</li>
+<li><strong>品質がちょうどAQLのロットが合格する確率</strong>：Pa(p = AQL)</li>
+<li>合格確率が95%・50%・10%になる不良率（下の「見分けられる品質の範囲」と同じ）</li>
 </ul>
-<p>AQL は「この品質なら大部分のロットが合格する」水準で、個々のロットの品質を保証する値ではありません。AQL より悪いロットも、ある確率で合格します。</p>
+<p>AQLは「この品質なら大部分のロットが合格する」水準で、個々のロットの品質を保証する値ではありません。AQLより悪いロットも、ある確率で合格します。</p>
 <h2>OC曲線・比較タブ</h2>
-<h3>OC 曲線</h3>
-<p>横軸にロットの不良率 p、縦軸に合格確率 Pa(p) をとった曲線です。p を 0 から少しずつ変えて、上の式で Pa を計算しています。超幾何分布では不良の個数 p × N が整数でないと計算できないので、前後の整数での値を直線でつないで（線形補間して）います。</p>
-<h3>AOQ（平均出検品質）と AOQL</h3>
+<h3>OC曲線</h3>
+<p>横軸にロットの不良率p、縦軸に合格確率Pa(p) をとった曲線です。pを0から少しずつ変えて、上の式でPaを計算しています。超幾何分布では不良の個数p × Nが整数でないと計算できないので、前後の整数での値を直線でつないで（線形補間して）います。</p>
+<h3>AOQ（平均出検品質）とAOQL</h3>
 <p>不合格のロットを全数選別し、見つけた不良を良品に置き換えて出荷する場合（選別型の抜取検査）、出荷される製品の平均の不良率です。</p>
 <pre><code>AOQ = Pa × p × (N − n) / N       （N を入力したとき）
 AOQ = Pa × p                      （N を入力しないとき）
 </code></pre>
 <ul>
-<li>合格したロット：抜き取った n 個は検査済みで不良は除かれ、残りの N − n 個の中に不良率 p の不良が残る</li>
-<li>不合格のロット：全数選別するので不良は 0</li>
-<li>AOQ は品質が良いとき（p が小さい）も悪いとき（ほとんどのロットが選別される）も小さくなり、途中に最大値があります。この最大値が <strong>AOQL</strong>（平均出検品質限界）で、どんな品質のロットが来ても出荷品質の平均はこれより悪くならない、という値です。曲線上の最大点の付近を細かく探して求めています</li>
+<li>合格したロット：抜き取ったn個は検査済みで不良は除かれ、残りのN − n個の中に不良率pの不良が残る</li>
+<li>不合格のロット：全数選別するので不良は0</li>
+<li>AOQは品質が良いとき（pが小さい）も悪いとき（ほとんどのロットが選別される）も小さくなり、途中に最大値があります。この最大値が <strong>AOQL</strong>（平均出検品質限界）で、どんな品質のロットが来ても出荷品質の平均はこれより悪くならない、という値です。曲線上の最大点の付近を細かく探して求めています</li>
 </ul>
-<p><strong>計算例</strong>：N = 1,000、n = 80、c = 2（超幾何分布）の AOQL は 1.57%（ロットの不良率 2.74% のとき）です。</p>
+<p><strong>計算例</strong>：N = 1,000、n = 80、c = 2（超幾何分布）のAOQLは1.57%（ロットの不良率2.74%のとき）です。</p>
 <h3>ATI（平均総検査数）</h3>
-<p>同じ選別型の前提で、1 ロットあたり平均で何個検査することになるかです。</p>
+<p>同じ選別型の前提で、1ロットあたり平均で何個検査することになるかです。</p>
 <pre><code>ATI = n + (1 − Pa) × (N − n)
 </code></pre>
-<p>合格すれば n 個だけ、不合格なら全数 N 個を検査するので、その期待値です。</p>
+<p>合格すればn個だけ、不合格なら全数N個を検査するので、その期待値です。</p>
 <h3>見分けられる品質の範囲</h3>
-<p>合格確率がちょうど 95%・50%・10% になる不良率を、二分法（Pa は p が大きくなると必ず下がるので、範囲を半分ずつ狭めて探す方法）で求めています。</p>
+<p>合格確率がちょうど95%・50%・10%になる不良率を、二分法（Paはpが大きくなると必ず下がるので、範囲を半分ずつ狭めて探す方法）で求めています。</p>
 <ul>
-<li>95% になる不良率：これより良いロットは 95% 以上の確率で合格する（生産者危険 α = 5% に対応）</li>
-<li>50% になる不良率：合格・不合格が五分五分になる品質</li>
-<li>10% になる不良率：これより悪いロットは 10% 以下の確率でしか合格しない（消費者危険 β = 10% に対応。LQ（限界品質）と呼ばれることが多い）</li>
+<li>95%になる不良率：これより良いロットは95%以上の確率で合格する（生産者危険α = 5%に対応）</li>
+<li>50%になる不良率：合格・不合格が五分五分になる品質</li>
+<li>10%になる不良率：これより悪いロットは10%以下の確率でしか合格しない（消費者危険β = 10%に対応。LQ（限界品質）と呼ばれることが多い）</li>
 </ul>
-<p>95% と 10% の間が狭い方式ほど、良いロットと悪いロットをはっきり見分けられます。</p>
+<p>95%と10%の間が狭い方式ほど、良いロットと悪いロットをはっきり見分けられます。</p>
 <h2>逆設計タブ</h2>
-<p>「品質 p₁ のロットは確率 1 − α 以上で合格させ、品質 p₂ のロットは確率 β 以下でしか合格させない」という条件を満たし、抜き取り数 n が最も小さい方式（n, c）を探します。</p>
+<p>「品質p₁ のロットは確率1 − α以上で合格させ、品質p₂ のロットは確率β以下でしか合格させない」という条件を満たし、抜き取り数nが最も小さい方式（n, c）を探します。</p>
 <pre><code>Pa(p₁) ≥ 1 − α    かつ    Pa(p₂) ≤ β
 </code></pre>
 <p>探し方は次のとおりです。</p>
 <ol>
 <li>c = 0, 1, 2, … の順に試す</li>
-<li>それぞれの c について、Pa(p₂) ≤ β になる最小の n を二分法で求める（n を増やすと Pa(p₂) は必ず下がる）</li>
-<li>その n で Pa(p₁) ≥ 1 − α も満たせば、それが答え。満たさなければ c を 1 増やす</li>
+<li>それぞれのcについて、Pa(p₂) ≤ βになる最小のnを二分法で求める（nを増やすとPa(p₂) は必ず下がる）</li>
+<li>そのnでPa(p₁) ≥ 1 − αも満たせば、それが答え。満たさなければcを1増やす</li>
 </ol>
-<p>c を増やすと必要な n も増えるので、最初に条件を満たした c の方式が n 最小になります。ロットサイズ N を入力すると超幾何分布、入力しなければ二項分布で計算します。</p>
+<p>cを増やすと必要なnも増えるので、最初に条件を満たしたcの方式がn最小になります。ロットサイズNを入力すると超幾何分布、入力しなければ二項分布で計算します。</p>
 <p><strong>計算例（初期値）</strong>：p₁ = 1%、α = 5%、p₂ = 5%、β = 10%（二項分布）</p>
 <table>
 <thead>
 <tr>
 <th>c</th>
-<th>Pa(p₂) ≤ 10% になる最小の n</th>
-<th>そのときの Pa(p₁)</th>
+<th>Pa(p₂) ≤ 10%になる最小のn</th>
+<th>そのときのPa(p₁)</th>
 <th>条件</th>
 </tr>
 </thead>
@@ -721,64 +721,66 @@ AOQ = Pa × p                      （N を入力しないとき）
 </tr>
 </tbody>
 </table>
-<h3>c = 0 方式との比較</h3>
-<p>c = 0（不良が 1 個でもあれば不合格）の方式は、二項分布なら Pa = (1 − p)^n なので、必要な n は式で直接求まります。</p>
+<h3>c = 0方式との比較</h3>
+<p>c = 0（不良が1個でもあれば不合格）の方式は、二項分布ならPa = (1 − p)^nなので、必要なnは式で直接求まります。</p>
 <pre><code>n = log(β) / log(1 − p₂) を切り上げ
 </code></pre>
-<p>p₂ = 5%、β = 10% なら log(0.1) / log(0.95) = 44.9 → n = 45 です。抜き取り数は少なくて済みますが、品質 p₁ = 1% の良いロットでも合格確率は 63.6% しかなく、3 ロットに 1 ロット以上を不合格にしてしまいます。</p>
+<p>p₂ = 5%、β = 10%ならlog(0.1) / log(0.95) = 44.9 → n = 45です。抜き取り数は少なくて済みますが、品質p₁ = 1%の良いロットでも合格確率は63.6%しかなく、3ロットに1ロット以上を不合格にしてしまいます。</p>
 <h2>不良率推定タブ</h2>
-<p>n 個を検査して x 個の不良が見つかったとき、ロット（または工程）の不良率がどの範囲にあるかを推定します。二項分布に基づく <strong>Clopper-Pearson 法（正確法）</strong> を使います。近似を使わないので、x = 0 や n が小さいときにも信頼度を下回りません。</p>
-<p>信頼度を 1 − a（95% なら a = 0.05）とすると、</p>
+<p>n個を検査してx個の不良が見つかったとき、ロット（または工程）の不良率がどの範囲にあるかを推定します。二項分布に基づく <strong>Clopper-Pearson法（正確法）</strong> を使います。近似を使わないので、x = 0やnが小さいときにも信頼度を下回りません。</p>
+<p>信頼度を1 − a（95%ならa = 0.05）とすると、</p>
 <pre><code>両側の下限 = B⁻¹(a/2;  x,  n − x + 1)          （x = 0 のときは 0）
 両側の上限 = B⁻¹(1 − a/2;  x + 1,  n − x)       （x = n のときは 1）
 片側の上限 = B⁻¹(1 − a;  x + 1,  n − x)
 </code></pre>
-<p>B⁻¹(q; a, b) はベータ分布の分位点（累積確率が q になる値）です。両側の区間は「不良率はこの範囲にある」、片側の上限は「不良率はこれより悪くはない」と言うための値です。品質の保証には、片側の上限を使うのが普通です。</p>
-<h3>不良 0 個のとき</h3>
-<p>x = 0 なら片側の上限は式が簡単になります。</p>
+<p>B⁻¹(q; a, b) はベータ分布の分位点（累積確率がqになる値）です。両側の区間は「不良率はこの範囲にある」、片側の上限は「不良率はこれより悪くはない」と言うための値です。品質の保証には、片側の上限を使うのが普通です。</p>
+<h3>不良0個のとき</h3>
+<p>x = 0なら片側の上限は式が簡単になります。</p>
 <pre><code>片側の上限 = 1 − (1 − 信頼度)^(1/n)
 </code></pre>
-<p>n = 300、信頼度 95% なら 1 − 0.05^(1/300) = 0.994% です。95% の場合は 3 / n（この例なら 1%）でほぼ同じ値になり、「3 の法則」と呼ばれます。「300 個検査して不良 0 個」から言えるのは「不良率は 1% 未満」までで、「不良はない」とは言えません。</p>
+<p>n = 300、信頼度95%なら1 − 0.05^(1/300) = 0.994%です。95%の場合は3 / n（この例なら1%）でほぼ同じ値になり、「3の法則」と呼ばれます。「300個検査して不良0個」から言えるのは「不良率は1%未満」までで、「不良はない」とは言えません。</p>
 <h3>ロットの中の不良の個数の上限</h3>
-<p>ロットサイズ N を入力すると、ロット全体に残っている不良の個数の上限を超幾何分布で求めます。</p>
+<p>ロットサイズNを入力すると、ロット全体に残っている不良の個数の上限を超幾何分布で求めます。</p>
 <pre><code>P(X ≤ x | D) ≥ 1 − 信頼度    を満たす最大の D
 </code></pre>
-<p>「ロットに不良が D 個あったら、抜き取りで x 個以下しか見つからない確率は 1 − 信頼度 未満になる」ので、それより多い不良はほぼありえない、という考え方です。例：N = 2,000 のうち 300 個を検査して不良 0 個なら、信頼度 95% でロットの不良は 18 個以下です。</p>
+<p>「ロットに不良がD個あったら、抜き取りでx個以下しか見つからない確率は1 − 信頼度 未満になる」ので、それより多い不良はほぼありえない、という考え方です。例：N = 2,000のうち300個を検査して不良0個なら、信頼度95%でロットの不良は18個以下です。</p>
 <h3>必要な検査数（逆算）</h3>
-<p>「必要な検査数」に切り替えると、上の推定を逆にたどって、<strong>n 個を検査して不良が x 個以下なら「不良率は p_u 以下」と言える</strong>最小の n を求めます。</p>
+<p>「必要な検査数」に切り替えると、上の推定を逆にたどって、<strong>n個を検査して不良がx個以下なら「不良率はp_u以下」と言える</strong>最小のnを求めます。</p>
 <pre><code>片側の上限 ≤ p_u   ⇔   P(X ≤ x | n, p_u) ≤ 1 − 信頼度    を満たす最小の n
 </code></pre>
-<p>P(X ≤ x | n, p_u) は二項分布の累積確率です。n が増えるほど小さくなるので、二分法で最小の n を探します。</p>
-<p>不良を 1 個も許容しない（x = 0）ときは、式を解いて</p>
+<p>P(X ≤ x | n, p_u) は二項分布の累積確率です。nが増えるほど小さくなるので、二分法で最小のnを探します。</p>
+<p>不良を1個も許容しない（x = 0）ときは、式を解いて</p>
 <pre><code>n = ln(1 − 信頼度) / ln(1 − p_u)    （切り上げ）
 </code></pre>
-<p>になります。信頼性の分野で success-run（ゼロ故障試験）と呼ばれる式と同じもので、信頼度 R = 1 − p_u、信頼水準 C = 信頼度 と読み替えれば一致します。例：p_u = 1 %、信頼度 95 % なら ln 0.05 / ln 0.99 = 298.1 → <strong>299 個</strong>。1 個まで許容するなら 473 個です。</p>
-<p>ロットサイズ N を入れると超幾何分布で計算し、「ロットの不良は floor(p_u × N) 個以下」と言える最小の n を求めます（上の「ロットの中の不良の個数の上限」の逆算）。例：N = 1,000、p_u = 1 %、信頼度 95 %、x = 0 なら 238 個で、ロットの不良は 10 個以下と言えます。</p>
-<p>許容する不良数を増やすと検査数は増えます。その代わり、工程の不良率が p_u よりかなり良いときに、たまたま 1 個出ただけで「言えない」となる確率が下がります。</p>
+<p>になります。信頼性の分野でsuccess-run（ゼロ故障試験）と呼ばれる式と同じもので、信頼度R = 1 − p_u、信頼水準C = 信頼度 と読み替えれば一致します。例：p_u = 1 %、信頼度95 %ならln 0.05 / ln 0.99 = 298.1 → <strong>299個</strong>。1個まで許容するなら473個です。</p>
+<p>ロットサイズNを入れると超幾何分布で計算し、「ロットの不良はfloor(p_u × N) 個以下」と言える最小のnを求めます（上の「ロットの中の不良の個数の上限」の逆算）。例：N = 1,000、p_u = 1 %、信頼度95 %、x = 0なら238個で、ロットの不良は10個以下と言えます。</p>
+<p>許容する不良数を増やすと検査数は増えます。その代わり、工程の不良率がp_uよりかなり良いときに、たまたま1個出ただけで「言えない」となる確率が下がります。</p>
 <h2>数値計算の方法</h2>
 <ul>
-<li>組み合わせの数や確率は桁がとても大きく（小さく）なるので、すべて対数で計算します。log C(a, b) は対数ガンマ関数（Lanczos 近似）で求め、確率の足し合わせは指数の桁あふれが起きない方法（log-sum-exp）で行います。n が数万でも計算できます</li>
+<li>組み合わせの数や確率は桁がとても大きく（小さく）なるので、すべて対数で計算します。log C(a, b) は対数ガンマ関数（Lanczos近似）で求め、確率の足し合わせは指数の桁あふれが起きない方法（log-sum-exp）で行います。nが数万でも計算できます</li>
 <li>ベータ分布の累積確率（正則化不完全ベータ関数）は連分数展開で計算し、分位点は二分法で求めます</li>
-<li>計算結果は scipy で求めた値と照合するテストで確認しています</li>
+<li>計算結果はscipyで求めた値と照合するテストで確認しています</li>
 </ul>
 <h2>規格について</h2>
 <ul>
-<li>AQL 表は MIL-STD-105E（1989-05-10）の表I・表II-A/B/C です（DTIC ADA284013、配布制限なし）</li>
-<li>現行の JIS Z 9015-1:2006（ISO 2859-1:1999）の表は著作権で保護されていて、無断で転載できません。このツールはソースコードと表を公開しているので、表をそのまま載せられる MIL-STD-105E を採用しています</li>
-<li>JIS Z 9015-1 とは、ゆるい検査の方式と切替ルールが異なります。なみ・きつい検査の表を現行の JIS として扱う場合は、JIS の本文と照合してください</li>
+<li>AQL表はMIL-STD-105E（1989-05-10）の表I・表II-A/B/Cです（DTIC ADA284013、配布制限なし）</li>
+<li>現行のJIS Z 9015-1:2006（ISO 2859-1:1999）の表は著作権で保護されていて、無断で転載できません。このツールはソースコードと表を公開しているので、表をそのまま載せられるMIL-STD-105Eを採用しています</li>
+<li>JIS Z 9015-1とは、ゆるい検査の方式と切替ルールが異なります。なみ・きつい検査の表を現行のJISとして扱う場合は、JISの本文と照合してください</li>
 </ul>
 <!--EXPLAIN-END-->
   </div>
 </section>
 
-<footer class="src">
-  <p>AQL表の出典は MIL-STD-105E（1989-05-10）表I・表II-A/B/C、DTIC
+<section class="src" aria-label="AQL表の出典と計算の前提">
+  <p>AQL表の出典はMIL-STD-105E（1989-05-10）表I・表II-A/B/C、DTIC
   <a href="https://apps.dtic.mil/sti/tr/pdf/ADA284013.pdf" target="_blank" rel="noopener">ADA284013</a>（Distribution Statement A）です。
-  現行の JIS Z 9015-1:2006（ISO 2859-1:1999）の表は著作権で保護されていて無断で転載できないため、表をそのまま公開できる MIL-STD-105E を採用しています。
-  JIS Z 9015-1 とは、ゆるい検査の方式と切替ルールが異なります。なみ・きつい検査の表を現行JISとして扱う場合は、JIS本文と照合してください。
-  AOQ・ATI は「不合格ロットを全数選別し、不良品を良品に置き換える」前提の値です。区間推定は Clopper-Pearson 法（正確法）です。
+  現行のJIS Z 9015-1:2006（ISO 2859-1:1999）の表は著作権で保護されていて無断で転載できないため、表をそのまま公開できるMIL-STD-105Eを採用しています。
+  JIS Z 9015-1とは、ゆるい検査の方式と切替ルールが異なります。なみ・きつい検査の表を現行JISとして扱う場合は、JIS本文と照合してください。
+  AOQ・ATIは「不合格ロットを全数選別し、不良品を良品に置き換える」前提の値です。区間推定はClopper-Pearson法（正確法）です。
   合格率タブは超幾何分布による厳密計算で、流出する不良は「不合格ロットは出荷しない」前提の値です。</p>
-  <p><a href="https://github.com/kotaooka/sampling-calc">GitHub</a> ・ MIT License<span class="support"> ・ <a href="https://buymeacoffee.com/kotaooka" target="_blank" rel="noopener"><span aria-hidden="true">☕</span> 開発を応援する（Buy Me a Coffee）</a></span></p>
+</section>
+<footer class="src">
+  <a href="https://github.com/kotaooka/sampling-calc">GitHub</a> ・ MIT License<span class="support"> ・ <a href="https://buymeacoffee.com/kotaooka" target="_blank" rel="noopener"><span aria-hidden="true">☕</span> 開発を応援する（Buy Me a Coffee）</a></span>
 </footer>
 </main>
 

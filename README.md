@@ -99,6 +99,19 @@
 
 ---
 
+## 計算の検証
+
+push のたびに GitHub Actions で `node tests/test.js` を実行し、次の値と照合しています（全 53 件一致）。
+
+- **二項分布・超幾何分布・ポアソン分布の累積確率**：Python の scipy.stats で求めた値（16 件、相対差 10⁻⁹ 以内）
+- **Clopper-Pearson の信頼区間**：scipy の beta 分布で求めた値（5 件、相対差 10⁻⁷ 以内）
+- **抜取方式の設計・ロット合格率・必要な抜取数**：scipy で求めた値（19 件）
+- **AQL 表**：MIL-STD-105E（1989-05-10）による既知の値 8 件と、原本の写しから読み取った表 I・表 II-A/B/C の全セルとの照合 5 件
+
+参照値は `python tests/make_reference.py` で作り直せます（scipy が必要）。ブラウザで一覧したいときは `tests/test.html` を開いてください。
+
+---
+
 ## 開発者向けの情報
 
 ファイル構成、更新して公開する手順、計算方法、AQL表データの出典、テストについては [DEVELOPMENT.md](DEVELOPMENT.md) を参照してください。

@@ -357,19 +357,19 @@
     const v = $('l-verdict');
     $('l-p-field').hidden = byCount; $('l-D-field').hidden = !byCount;
     const clear = () => { ['l-lot', 'l-dist', 'l-dist-key', 'l-waffle', 'l-tiles', 'l-oc', 'l-nn'].forEach(id => { $(id).innerHTML = ''; }); $('l-D-hint').textContent = ''; };
-    if (!(Number.isInteger(N) && N >= 1)) { clear(); return errBox(v, 'ロットサイズは 1 以上の整数で入力する'); }
+    if (!(Number.isInteger(N) && N >= 1)) { clear(); return errBox(v, 'ロットサイズは1以上の整数で入力する'); }
     if (byCount) {
-      if (!(Number.isInteger(st.D) && st.D >= 0 && st.D <= N)) { clear(); return errBox(v, '不良数は 0 以上、ロットサイズ以下の整数で入力する'); }
-    } else if (!(pP >= 0 && pP <= 100)) { clear(); return errBox(v, '不良率は 0〜100 % で入力する'); }
-    if (!(Number.isInteger(n) && n >= 1 && n <= N)) { clear(); return errBox(v, '抜き取り数は 1 以上、ロットサイズ以下の整数で入力する'); }
-    if (!(Number.isInteger(c) && c >= 0)) { clear(); return errBox(v, 'c は 0 以上の整数で入力する'); }
+      if (!(Number.isInteger(st.D) && st.D >= 0 && st.D <= N)) { clear(); return errBox(v, '不良数は0以上、ロットサイズ以下の整数で入力する'); }
+    } else if (!(pP >= 0 && pP <= 100)) { clear(); return errBox(v, '不良率は0〜100 %で入力する'); }
+    if (!(Number.isInteger(n) && n >= 1 && n <= N)) { clear(); return errBox(v, '抜き取り数は1以上、ロットサイズ以下の整数で入力する'); }
+    if (!(Number.isInteger(c) && c >= 0)) { clear(); return errBox(v, 'cは0以上の整数で入力する'); }
     let D;
     if (byCount) {
       D = st.D;
-      $('l-D-hint').textContent = `不良率に直すと ${pct(D / N)}`;
+      $('l-D-hint').textContent = `不良率に直すと${pct(D / N)}`;
     } else {
       const exact = pP / 100 * N; D = Math.round(exact);
-      $('l-D-hint').textContent = `ロット内の不良 ${fmtInt(D)} 個` + (Math.abs(exact - D) > 1e-9 ? `（${sig3(exact)} 個を四捨五入）` : '');
+      $('l-D-hint').textContent = `ロット内の不良${fmtInt(D)}個` + (Math.abs(exact - D) > 1e-9 ? `（${sig3(exact)}個を四捨五入）` : '');
     }
     const J = S.lotJudge(N, D, n, c);
     const pa = J.pa;
@@ -377,15 +377,15 @@
     v.innerHTML = `<div class="eyebrow">このロットが合格する確率</div>
       <div class="big">${num(prob(pa))}</div>
       ${splitBar(pa, '合格', '不合格')}
-      <p class="note">不良 ${fmtInt(D)} 個を含む ${fmtInt(N)} 個のロットから ${fmtInt(n)} 個を抜き取り、不良が ${c} 個以下なら合格とする場合。</p>`;
+      <p class="note">不良${fmtInt(D)}個を含む${fmtInt(N)}個のロットから${fmtInt(n)}個を抜き取り、不良が${c}個以下なら合格とする場合。</p>`;
 
     // ロットと抜き取りの構成
-    const badTxt = D / N >= 0.12 ? `不良 ${fmtInt(D)}` : '';
+    const badTxt = D / N >= 0.12 ? `不良${fmtInt(D)}` : '';
     $('l-lot').innerHTML = `
-      <div class="viz-title"><span>ロット ${fmtInt(N)} 個の中身</span><b>不良 ${fmtInt(D)} 個（${pct(D / N)}）</b></div>
-      ${lotBar([{ cls: 'bad', n: D, text: badTxt }, { cls: 'good', n: N - D, text: `良品 ${fmtInt(N - D)}` }])}
-      <div class="viz-title" style="margin-top:8px"><span>検査する範囲</span><b>${fmtInt(n)} 個（${pct(n / N)}）</b></div>
-      ${lotBar([{ cls: 'samp', n, text: n / N >= 0.15 ? `検査 ${fmtInt(n)}` : '' }, { cls: 'rest', n: N - n, text: `検査しない ${fmtInt(N - n)}` }])}
+      <div class="viz-title"><span>ロット${fmtInt(N)}個の中身</span><b>不良${fmtInt(D)}個（${pct(D / N)}）</b></div>
+      ${lotBar([{ cls: 'bad', n: D, text: badTxt }, { cls: 'good', n: N - D, text: `良品${fmtInt(N - D)}` }])}
+      <div class="viz-title" style="margin-top:8px"><span>検査する範囲</span><b>${fmtInt(n)}個（${pct(n / N)}）</b></div>
+      ${lotBar([{ cls: 'samp', n, text: n / N >= 0.15 ? `検査${fmtInt(n)}` : '' }, { cls: 'rest', n: N - n, text: `検査しない${fmtInt(N - n)}` }])}
       <div class="key"><span style="--c:var(--ng)">不良</span><span style="--c:var(--accent)">抜き取って検査</span><span style="--c:var(--grid)">良品・検査しない</span></div>`;
 
     // 抜取中の不良数の分布
@@ -397,16 +397,16 @@
     for (let d = 0; d <= kMax; d++) {
       const y = J.pmf[d] || 0; yMx = Math.max(yMx, y);
       const ok = d <= c;
-      bars.push({ label: String(d), y, color: ok ? OK() : NG(), tip: `<div>不良 ${d} 個</div><div><b class="num">${prob(y)}</b>（${ok ? '合格' : '不合格'}）</div>` });
+      bars.push({ label: String(d), y, color: ok ? OK() : NG(), tip: `<div>不良${d}個</div><div><b class="num">${prob(y)}</b>（${ok ? '合格' : '不合格'}）</div>` });
     }
-    $('l-dist-title').textContent = `抜き取った ${fmtInt(n)} 個に入る不良の数`;
+    $('l-dist-title').textContent = `抜き取った${fmtInt(n)}個に入る不良の数`;
     drawBars($('l-dist'), {
       bars, yMax: niceMax(yMx * 1.12), yFmt: y => Math.round(y * 100) + '%',
       xTitle: '抜き取った中の不良数 [個]', yTitle: '起こる確率',
       divider: { after: c, left: '合格', right: '不合格' },
       showValues: b => kMax <= 14 && b.y >= 0.005, valueFmt: y => (y * 100).toFixed(y >= 0.1 ? 0 : 1) + '%'
     });
-    $('l-dist-key').innerHTML = `<span style="--c:var(--ok)">合格になる（${c} 個以下）</span><span style="--c:var(--ng)">不合格になる（${c + 1} 個以上）</span><span style="--c:transparent">平均 ${sig3(J.mean)} 個</span>`;
+    $('l-dist-key').innerHTML = `<span style="--c:var(--ok)">合格になる（${c}個以下）</span><span style="--c:var(--ng)">不合格になる（${c + 1}個以上）</span><span style="--c:transparent">平均${sig3(J.mean)}個</span>`;
 
     // 100ロット
     const okN = Math.round(pa * 100);
@@ -424,7 +424,7 @@
     drawChart($('l-oc'), {
       series: [{ name: '合格確率', pts: seriesFrom(plan, 'hypergeometric', Math.min(1, xMax), 'pa').pts, color: cssVar('--s1') }],
       xMax: Math.min(1, xMax), yMax: 1, xFmt: x => sig3(x * 100), yFmt: y => Math.round(y * 100) + '%',
-      xTitle: 'ロットの不良率 [%]', yTitle: '合格確率', tipX: x => '不良率 ' + pct(x), tipY: y => prob(y),
+      xTitle: 'ロットの不良率 [%]', yTitle: '合格確率', tipX: x => '不良率' + pct(x), tipY: y => prob(y),
       markers: [{ x: D / N, y: pa, label: 'このロット', color: cssVar('--ink') }]
     });
     // 抜き取り数を変えたら
@@ -437,8 +437,8 @@
     drawChart($('l-nn'), {
       series: [{ name: '合格確率', pts, color: cssVar('--s2') }],
       xMax: nMax, yMax: 1, xFmt: x => fmtInt(Math.round(x)), yFmt: y => Math.round(y * 100) + '%',
-      xTitle: '抜き取り数 [個]', yTitle: '合格確率', tipX: x => '抜き取り ' + fmtInt(Math.round(x)) + ' 個', tipY: y => prob(y),
-      markers: [{ x: n, y: pa, label: `いまの ${fmtInt(n)} 個`, color: cssVar('--ink') }]
+      xTitle: '抜き取り数 [個]', yTitle: '合格確率', tipX: x => '抜き取り' + fmtInt(Math.round(x)) + '個', tipY: y => prob(y),
+      markers: [{ x: n, y: pa, label: `いまの${fmtInt(n)}個`, color: cssVar('--ink') }]
     });
   }
   [['l-N', 'N'], ['l-p', 'p'], ['l-D', 'D'], ['l-n', 'n'], ['l-c', 'c']].forEach(([id, k]) => $(id).addEventListener('input', e => { state.lot[k] = e.target.value === '' ? NaN : +e.target.value; render(); }));
@@ -456,7 +456,7 @@
     state.lot.N = Math.floor(st.N); state.lot.n = Math.min(r.n, state.lot.N); state.lot.c = r.ac;
     $('l-N').value = state.lot.N; $('l-n').value = state.lot.n; $('l-c').value = state.lot.c;
     render();
-    toast(`AQL ${st.aql}・水準 ${st.lv} の方式（n=${r.n}, c=${r.ac}）を入れた`);
+    toast(`AQL ${st.aql}・水準${st.lv}の方式（n=${r.n}, c=${r.ac}）を入れた`);
   });
 
   // ---------- AQL方式 ----------
@@ -487,30 +487,30 @@
     const st = state.aql;
     const N = Math.floor(st.N), aqlV = parseFloat(st.aql), perUnit = aqlV > 10;
     $('aql-unit-hint').textContent = perUnit
-      ? '10 を超える AQL は「100単位当たりの欠点数」として扱う'
+      ? '10を超えるAQLは「100単位当たりの欠点数」として扱う'
       : '不良率 [%]（100単位当たりの欠点数としても使える）';
     const v = $('aql-verdict'), viz = $('aql-viz');
-    if (!(N >= 2)) { errBox(v, 'ロットサイズは 2 以上の整数で入力する'); viz.innerHTML = ''; $('aql-chart').innerHTML = ''; return; }
+    if (!(N >= 2)) { errBox(v, 'ロットサイズは2以上の整数で入力する'); viz.innerHTML = ''; $('aql-chart').innerHTML = ''; return; }
     const r = lookupAql(N, st.lv, st.aql, st.sev);
     const unit = perUnit ? '欠点' : '不良';
     const full = r.n >= N;
     const sevName = { normal: 'なみ検査', tightened: 'きつい検査', reduced: 'ゆるい検査' }[st.sev];
     if (full) {
-      v.innerHTML = `<div class="eyebrow">${sevName}・サンプル文字 ${r.used}</div>
+      v.innerHTML = `<div class="eyebrow">${sevName}・サンプル文字${r.used}</div>
         <div class="big">全数検査</div>
-        <div class="rules"><span class="chip warn"><span class="ic">!</span>表のサンプル数 n = ${num(fmtInt(r.n))} がロットサイズ以上</span></div>
-        <p class="note">MIL-STD-105E では、サンプル数がロットサイズ以上になる場合は全数検査を行う。</p>`;
+        <div class="rules"><span class="chip warn"><span class="ic">!</span>表のサンプル数n = ${num(fmtInt(r.n))}がロットサイズ以上</span></div>
+        <p class="note">MIL-STD-105Eでは、サンプル数がロットサイズ以上になる場合は全数検査を行う。</p>`;
     } else {
-      let rules = `<span class="chip ok"><span class="ic">✓</span>${unit} ${num(r.ac)} 個以下 → 合格</span>
-        <span class="chip ng"><span class="ic">✕</span>${num(r.re)} 個以上 → 不合格</span>`;
+      let rules = `<span class="chip ok"><span class="ic">✓</span>${unit} ${num(r.ac)}個以下 → 合格</span>
+        <span class="chip ng"><span class="ic">✕</span>${num(r.re)}個以上 → 不合格</span>`;
       let extra = '';
       if (r.re - r.ac > 1) {
         const a = r.ac + 1, b = r.re - 1;
-        rules += `<span class="chip warn"><span class="ic">!</span>${num(a === b ? a : a + '〜' + b)} 個 → 合格だが、なみ検査に戻す</span>`;
-        extra = '<p class="note">ゆるい検査で合格判定個数と不合格判定個数の間に差があるのは MIL-STD-105E の規定。JIS Z 9015-1:2006 ではこの差は解消されている。</p>';
+        rules += `<span class="chip warn"><span class="ic">!</span>${num(a === b ? a : a + '〜' + b)}個 → 合格だが、なみ検査に戻す</span>`;
+        extra = '<p class="note">ゆるい検査で合格判定個数と不合格判定個数の間に差があるのはMIL-STD-105Eの規定。JIS Z 9015-1:2006ではこの差は解消されている。</p>';
       }
-      v.innerHTML = `<div class="eyebrow">${sevName}・サンプル文字 ${r.used}${r.used !== r.L ? '（表Iでは ' + r.L + '）' : ''}</div>
-        <div class="big">${num(fmtInt(r.n))} 個を抜き取る</div>
+      v.innerHTML = `<div class="eyebrow">${sevName}・サンプル文字${r.used}${r.used !== r.L ? '（表Iでは' + r.L + '）' : ''}</div>
+        <div class="big">${num(fmtInt(r.n))}個を抜き取る</div>
         <div class="rules">${rules}</div>${extra}`;
     }
     const nn = Math.min(r.n, N);
@@ -518,11 +518,11 @@
     const dist = perUnit ? 'poisson' : S.autoDist(plan);
     const pAql = aqlV / 100;
     const badges = `<div class="badges"><span class="badge">サンプル文字 <b>${r.L}</b></span>${r.used !== r.L ? `<span class="badge">矢印で <b>${r.used}</b> に変更</span>` : ''}${full ? '' : `<span class="badge">${distName[dist]}で計算</span>`}</div>`;
-    const lotViz = `<div class="viz"><div class="viz-title"><span>ロット ${fmtInt(N)} 個のうち検査する数</span><b>${fmtInt(nn)} 個（${pct(nn / N)}）</b></div>
-      ${lotBar([{ cls: 'samp', n: nn, text: nn / N >= 0.15 ? `検査 ${fmtInt(nn)}` : '' }, { cls: 'rest', n: N - nn, text: N - nn > 0 ? `検査しない ${fmtInt(N - nn)}` : '' }])}</div>`;
+    const lotViz = `<div class="viz"><div class="viz-title"><span>ロット${fmtInt(N)}個のうち検査する数</span><b>${fmtInt(nn)}個（${pct(nn / N)}）</b></div>
+      ${lotBar([{ cls: 'samp', n: nn, text: nn / N >= 0.15 ? `検査${fmtInt(nn)}` : '' }, { cls: 'rest', n: N - nn, text: N - nn > 0 ? `検査しない${fmtInt(N - nn)}` : '' }])}</div>`;
     if (full) {
       viz.innerHTML = lotViz + badges;
-      $('aql-chart').innerHTML = '<p class="note">全数検査のため OC 曲線はない。</p>';
+      $('aql-chart').innerHTML = '<p class="note">全数検査のためOC曲線はない。</p>';
       renderAql.last = null;
       return;
     }
@@ -530,7 +530,7 @@
     const lim = perUnit ? 50 : 1;
     const p95 = S.pAtPa(0.95, plan, dist, lim), p50 = S.pAtPa(0.50, plan, dist, lim), p10 = S.pAtPa(0.10, plan, dist, lim);
     viz.innerHTML = judgeLine(r.ac, r.re, unit) + lotViz +
-      `<div class="viz"><div class="viz-title"><span>品質がちょうど AQL のロットが合格する確率</span><b>${prob(paAql)}</b></div>${gauge(paAql, cssVar('--ok'))}<div class="gauge-scale"><span>0 %</span><span>100 %</span></div></div>` +
+      `<div class="viz"><div class="viz-title"><span>品質がちょうどAQLのロットが合格する確率</span><b>${prob(paAql)}</b></div>${gauge(paAql, cssVar('--ok'))}<div class="gauge-scale"><span>0 %</span><span>100 %</span></div></div>` +
       badges;
     const xMax = autoXMax([plan], () => dist);
     const s = seriesFrom(plan, dist, xMax, 'pa');
@@ -540,7 +540,7 @@
       xFmt: x => sig3(x * 100), yFmt: y => Math.round(y * 100) + '%',
       xTitle: perUnit ? 'ロットの品質 [100単位当たり欠点数]' : 'ロットの不良率 [%]',
       yTitle: '合格確率',
-      tipX: x => (perUnit ? '欠点数 ' + sig3(x * 100) + ' /100単位' : '不良率 ' + pct(x)),
+      tipX: x => (perUnit ? '欠点数' + sig3(x * 100) + ' /100単位' : '不良率' + pct(x)),
       tipY: y => prob(y),
       vlines: [{ x: pAql, label: 'AQL' }],
       markers: [
@@ -613,21 +613,21 @@
     const st = state.oc;
     const notes = [];
     const plans = validPlans().map(p => ({ ...p, N: p.N === '' ? null : p.N }));
-    if (plans.length < state.oc.plans.length) notes.push('入力に誤りがある方式は表示していない（c < n ≤ N の整数で入力する）。');
+    if (plans.length < state.oc.plans.length) notes.push('入力に誤りがある方式は表示していない（c < n ≤ Nの整数で入力する）。');
     const distOf = p => {
       if (st.dist === 'auto') return S.autoDist(p);
       if (st.dist === 'hypergeometric' && !p.N) return 'binomial';
       return st.dist;
     };
-    if (st.dist === 'hypergeometric' && plans.some(p => !p.N)) notes.push('N が空欄の方式は二項分布で計算している。');
+    if (st.dist === 'hypergeometric' && plans.some(p => !p.N)) notes.push('Nが空欄の方式は二項分布で計算している。');
     const kind = st.kind;
     let shown = plans;
     if (kind === 'ati') {
       shown = plans.filter(p => p.N);
-      if (shown.length < plans.length) notes.push('ATI はロットサイズ N が必要なので、N が空欄の方式は表示していない。');
+      if (shown.length < plans.length) notes.push('ATIはロットサイズNが必要なので、Nが空欄の方式は表示していない。');
     }
-    if (kind === 'aoq' && plans.some(p => !p.N)) notes.push('N が空欄の方式の AOQ は Pa × p で近似している。');
-    if (kind === 'aoq') notes.push('点は各方式の AOQL（出荷品質の最悪値）。');
+    if (kind === 'aoq' && plans.some(p => !p.N)) notes.push('Nが空欄の方式のAOQはPa × pで近似している。');
+    if (kind === 'aoq') notes.push('点は各方式のAOQL（出荷品質の最悪値）。');
     if (ocIsExample) notes.unshift('表示中の3方式は入力例。');
     const isPois = plans.length && plans.every(p => distOf(p) === 'poisson');
     const xMax = parseFloat(st.xmax) > 0 ? parseFloat(st.xmax) / 100 : autoXMax(plans.length ? plans : [{ n: 50, c: 1 }], distOf);
@@ -644,7 +644,7 @@
     }
     if (kind === 'ati') {
       let mx = 0; series.forEach(s => s.pts.forEach(q => { if (q[1] > mx) mx = q[1]; }));
-      yMax = niceMax(mx || 1); yTitle = 'ATI（平均検査数）[個]'; yFmt = y => fmtInt(Math.round(y)); tipY = y => fmtInt(Math.round(y)) + ' 個';
+      yMax = niceMax(mx || 1); yTitle = 'ATI（平均検査数）[個]'; yFmt = y => fmtInt(Math.round(y)); tipY = y => fmtInt(Math.round(y)) + '個';
     }
     const markers = [];
     if (kind === 'aoq') series.forEach(s => {
@@ -654,7 +654,7 @@
     if (series.length) {
       drawChart($('oc-chart'), {
         series, xMax, yMax, xFmt: x => sig3(x * 100), yFmt, xTitle: unitX, yTitle,
-        tipX: x => (isPois ? '欠点数 ' + sig3(x * 100) + ' /100単位' : '不良率 ' + pct(x)), tipY, markers
+        tipX: x => (isPois ? '欠点数' + sig3(x * 100) + ' /100単位' : '不良率' + pct(x)), tipY, markers
       });
     } else {
       $('oc-chart').innerHTML = '<p class="note">表示できる方式がない。</p>';
@@ -676,7 +676,7 @@
     if (rows.length) {
       const rMax = Math.max(xMax, ...rows.map(r => isFinite(r.hi) ? r.hi * 1.05 : 0));
       drawRanges($('oc-range'), { rows, xMax: niceMax(rMax), xFmt: x => sig3(x * 100), xTitle: unitX });
-      $('oc-range-key').innerHTML = '<span style="--c:transparent">左端 = 95 % 合格する品質</span><span style="--c:transparent">○ = 50 %</span><span style="--c:transparent">右端 = 10 % しか合格しない品質</span>';
+      $('oc-range-key').innerHTML = '<span style="--c:transparent">左端 = 95 %合格する品質</span><span style="--c:transparent">○ = 50 %</span><span style="--c:transparent">右端 = 10 %しか合格しない品質</span>';
     } else { $('oc-range').innerHTML = ''; $('oc-range-key').innerHTML = ''; }
     ocCache = { plans, distOf, xMax, isPois };
   }
@@ -721,7 +721,7 @@
     const ok = actual <= target + 1e-12;
     return `<div class="viz"><div class="viz-title"><span>${title}</span><b>${prob(actual)}</b></div>
       ${gauge(actual / scale, ok ? cssVar('--ok') : cssVar('--ng'), target / scale)}
-      <div class="gauge-scale"><span>0 %</span><span>縦線 = 指定値 ${prob(target)}</span><span>${Math.round(scale * 100)} %</span></div></div>`;
+      <div class="gauge-scale"><span>0 %</span><span>縦線 = 指定値${prob(target)}</span><span>${Math.round(scale * 100)} %</span></div></div>`;
   }
   function renderDesign() {
     const st = state.d;
@@ -729,31 +729,31 @@
     const N = st.N === '' ? null : Math.floor(+st.N);
     const v = $('d-verdict'), viz = $('d-viz');
     const err = msg => { errBox(v, msg); viz.innerHTML = ''; $('d-chart').innerHTML = ''; $('d-bars').innerHTML = ''; $('d-legend').innerHTML = ''; dLast = null; };
-    if (!(p1 >= 0 && p2 > p1 && p2 < 1)) return err('0 ≤ p₁ < p₂ < 100 % で入力する');
-    if (!(a > 0 && a < 1 && b > 0 && b < 1)) return err('α と β は 0〜100 % の間で入力する');
-    if (N !== null && !(N >= 2)) return err('ロットサイズは 2 以上の整数で入力する');
+    if (!(p1 >= 0 && p2 > p1 && p2 < 1)) return err('0 ≤ p₁ < p₂ < 100 %で入力する');
+    if (!(a > 0 && a < 1 && b > 0 && b < 1)) return err('αとβは0〜100 %の間で入力する');
+    if (N !== null && !(N >= 2)) return err('ロットサイズは2以上の整数で入力する');
     const res = S.designPlan(p1, a, p2, b, N, 60);
     const z = S.zeroAcceptN(p2, b, N);
     const dist = res.dist;
     if (!res.plan) {
-      v.innerHTML = `<div class="eyebrow">条件を満たす方式なし</div><div class="big">c ≤ 60${N ? '、n ≤ N' : ''} の範囲では見つからない</div><p class="note">p₁ と p₂ が近すぎるか、ロットサイズに対して要求が厳しすぎる。p₂/p₁ を広げるか、α・β を緩める。</p>`;
+      v.innerHTML = `<div class="eyebrow">条件を満たす方式なし</div><div class="big">c ≤ 60${N ? '、n ≤ N' : ''}の範囲では見つからない</div><p class="note">p₁ とp₂ が近すぎるか、ロットサイズに対して要求が厳しすぎる。p₂/p₁ を広げるか、α・βを緩める。</p>`;
       viz.innerHTML = ''; $('d-chart').innerHTML = ''; $('d-legend').innerHTML = ''; dLast = null;
     } else {
       const pl = res.plan;
       v.innerHTML = `<div class="eyebrow">条件を満たす最小のサンプル数（${distName[dist]}）</div>
-        <div class="big">${num(fmtInt(pl.n))} 個を抜き取る</div>
-        <div class="rules"><span class="chip ok"><span class="ic">✓</span>不良 ${num(pl.c)} 個以下 → 合格</span><span class="chip ng"><span class="ic">✕</span>${num(pl.c + 1)} 個以上 → 不合格</span></div>`;
-      let html = riskViz(`良いロット（不良率 ${pct(p1)}）を不合格にしてしまう確率`, 1 - pl.pa1, a) +
-        riskViz(`悪いロット（不良率 ${pct(p2)}）を合格させてしまう確率`, pl.pa2, b);
+        <div class="big">${num(fmtInt(pl.n))}個を抜き取る</div>
+        <div class="rules"><span class="chip ok"><span class="ic">✓</span>不良${num(pl.c)}個以下 → 合格</span><span class="chip ng"><span class="ic">✕</span>${num(pl.c + 1)}個以上 → 不合格</span></div>`;
+      let html = riskViz(`良いロット（不良率${pct(p1)}）を不合格にしてしまう確率`, 1 - pl.pa1, a) +
+        riskViz(`悪いロット（不良率${pct(p2)}）を合格させてしまう確率`, pl.pa2, b);
       if (z) {
         const zpa1 = S.pAccept(p1, { n: z.n, c: 0, N }, dist);
         const mx = Math.max(pl.n, z.n);
         html += `<div class="viz"><div class="viz-title"><span>必要なサンプル数の比較</span></div>
-          <div class="viz-title"><span>この方式（c = ${pl.c}）</span><b>${fmtInt(pl.n)} 個</b></div>${gauge(pl.n / mx, cssVar('--s1'))}
-          <div class="viz-title" style="margin-top:4px"><span>c = 0 方式</span><b>${fmtInt(z.n)} 個</b></div>${gauge(z.n / mx, cssVar('--s2'))}
-          <div class="note" style="margin-top:4px">c = 0 方式は良いロットを不合格にする確率が ${prob(1 - zpa1)} になる。</div></div>`;
+          <div class="viz-title"><span>この方式（c = ${pl.c}）</span><b>${fmtInt(pl.n)}個</b></div>${gauge(pl.n / mx, cssVar('--s1'))}
+          <div class="viz-title" style="margin-top:4px"><span>c = 0方式</span><b>${fmtInt(z.n)}個</b></div>${gauge(z.n / mx, cssVar('--s2'))}
+          <div class="note" style="margin-top:4px">c = 0方式は良いロットを不合格にする確率が${prob(1 - zpa1)}になる。</div></div>`;
       }
-      if (N) html += `<div class="viz"><div class="viz-title"><span>ロット ${fmtInt(N)} 個のうち検査する数</span><b>${pct(pl.n / N)}</b></div>${lotBar([{ cls: 'samp', n: pl.n, text: pl.n / N >= 0.15 ? `検査 ${fmtInt(pl.n)}` : '' }, { cls: 'rest', n: N - pl.n, text: `検査しない ${fmtInt(N - pl.n)}` }])}</div>`;
+      if (N) html += `<div class="viz"><div class="viz-title"><span>ロット${fmtInt(N)}個のうち検査する数</span><b>${pct(pl.n / N)}</b></div>${lotBar([{ cls: 'samp', n: pl.n, text: pl.n / N >= 0.15 ? `検査${fmtInt(pl.n)}` : '' }, { cls: 'rest', n: N - pl.n, text: `検査しない${fmtInt(N - pl.n)}` }])}</div>`;
       viz.innerHTML = html;
       const planA = { n: pl.n, c: pl.c, N };
       const plans = [planA];
@@ -762,7 +762,7 @@
       const series = plans.map((p, i) => ({ name: `n=${p.n}, c=${p.c}`, pts: seriesFrom(p, dist, xMax, 'pa').pts, color: cssVar(SERIES[i]) }));
       drawChart($('d-chart'), {
         series, xMax, yMax: 1, xFmt: x => sig3(x * 100), yFmt: y => Math.round(y * 100) + '%',
-        xTitle: 'ロットの不良率 [%]', yTitle: '合格確率', tipX: x => '不良率 ' + pct(x), tipY: y => prob(y),
+        xTitle: 'ロットの不良率 [%]', yTitle: '合格確率', tipX: x => '不良率' + pct(x), tipY: y => prob(y),
         markers: [
           { x: p1, y: 1 - a, label: `p₁, 1−α`, cross: true, dy: 18 },
           { x: p2, y: b, label: `p₂, β`, cross: true, dy: -10 }
@@ -777,9 +777,9 @@
       drawBars($('d-bars'), {
         bars: tried.map(t => ({
           label: String(t.c), y: t.n, color: t.ok ? OK() : cssVar('--muted'),
-          tip: `<div>c = ${t.c}：n = <b class="num">${fmtInt(t.n)}</b></div><div>良いロットの合格確率 ${prob(t.pa1)}</div><div>悪いロットの合格確率 ${prob(t.pa2)}</div>`
+          tip: `<div>c = ${t.c}：n = <b class="num">${fmtInt(t.n)}</b></div><div>良いロットの合格確率${prob(t.pa1)}</div><div>悪いロットの合格確率${prob(t.pa2)}</div>`
         })),
-        yMax: niceMax(mx * 1.15), yFmt: y => fmtInt(Math.round(y)), xTitle: '合格判定個数 c', yTitle: '必要なサンプル数 [個]',
+        yMax: niceMax(mx * 1.15), yFmt: y => fmtInt(Math.round(y)), xTitle: '合格判定個数c', yTitle: '必要なサンプル数 [個]',
         showValues: () => tried.length <= 12, valueFmt: y => fmtInt(y)
       });
     } else $('d-bars').innerHTML = '';
@@ -803,26 +803,26 @@
     if (N !== null && !(N >= n)) return err('ロットサイズは検査数以上で入力する');
     const cp = S.clopperPearson(x, n, conf);
     const cs = Math.round(conf * 100);
-    v.innerHTML = `<div class="eyebrow">不良率の上限（信頼度 ${cs} %）</div>
-      <div class="big">${num(pct(cp.upper1))} 以下</div>
-      <p class="note">${fmtInt(n)} 個中 ${fmtInt(x)} 個が不良のとき、本当の不良率は信頼度 ${cs} % でこの値を超えないといえる。</p>`;
+    v.innerHTML = `<div class="eyebrow">不良率の上限（信頼度${cs} %）</div>
+      <div class="big">${num(pct(cp.upper1))}以下</div>
+      <p class="note">${fmtInt(n)}個中${fmtInt(x)}個が不良のとき、本当の不良率は信頼度${cs} %でこの値を超えないといえる。</p>`;
     const xMax = niceMax(Math.max(cp.upper2, cp.upper1) * 1.12);
     drawRanges($('e-range'), {
       rows: [
-        { label: `ここまでと言える上限（片側 ${cs} %）`, lo: 0, hi: cp.upper1, mid: null, color: cssVar('--ng'), hiText: pct(cp.upper1) },
-        { label: `本当の不良率がありそうな範囲（両側 ${cs} %）`, lo: cp.lower2, hi: cp.upper2, mid: cp.point, color: cssVar('--accent'), loText: pct(cp.lower2), hiText: pct(cp.upper2) }
+        { label: `ここまでと言える上限（片側${cs} %）`, lo: 0, hi: cp.upper1, mid: null, color: cssVar('--ng'), hiText: pct(cp.upper1) },
+        { label: `本当の不良率がありそうな範囲（両側${cs} %）`, lo: cp.lower2, hi: cp.upper2, mid: cp.point, color: cssVar('--accent'), loText: pct(cp.lower2), hiText: pct(cp.upper2) }
       ],
       xMax, xFmt: v => sig3(v * 100), xTitle: '不良率 [%]'
     });
-    $('e-range-key').innerHTML = `<span style="--c:transparent">○ = 実測の不良率 ${pct(cp.point)}</span>`;
+    $('e-range-key').innerHTML = `<span style="--c:transparent">○ = 実測の不良率${pct(cp.point)}</span>`;
     if (N) {
       const D = S.lotUpperDefects(x, n, N, conf);
       lot.hidden = false;
-      lot.innerHTML = `<div class="viz-title"><span>ロット ${fmtInt(N)} 個の内訳</span><b>不良は最大 ${fmtInt(D)} 個（${pct(D / N)}）</b></div>
-        ${lotBar([{ cls: 'samp', n, text: n / N >= 0.15 ? `検査済み ${fmtInt(n)}` : '' }, { cls: 'rest', n: N - n, text: N - n > 0 ? `未検査 ${fmtInt(N - n)}` : '' }])}
+      lot.innerHTML = `<div class="viz-title"><span>ロット${fmtInt(N)}個の内訳</span><b>不良は最大${fmtInt(D)}個（${pct(D / N)}）</b></div>
+        ${lotBar([{ cls: 'samp', n, text: n / N >= 0.15 ? `検査済み${fmtInt(n)}` : '' }, { cls: 'rest', n: N - n, text: N - n > 0 ? `未検査${fmtInt(N - n)}` : '' }])}
         <div class="tiles" style="margin-top:8px">
           ${tile('検査で見つかった不良', `${num(fmtInt(x))} <small>個</small>`, 'var(--accent)')}
-          ${tile(`未検査の ${fmtInt(N - n)} 個に残りうる不良`, `${num(fmtInt(D - x))} <small>個以下</small>`, 'var(--ng)')}
+          ${tile(`未検査の${fmtInt(N - n)}個に残りうる不良`, `${num(fmtInt(D - x))} <small>個以下</small>`, 'var(--ng)')}
           ${tile('ロット全体の不良', `${num(fmtInt(D))} <small>個以下（${cs} %）</small>`, 'var(--ng)')}
         </div>
         <div class="key"><span style="--c:var(--accent)">検査済み</span><span style="--c:var(--grid)">未検査</span></div>`;
@@ -836,26 +836,26 @@
     const N = st.N === '' ? null : Math.floor(+st.N);
     const v = $('e-verdict'), lot = $('e-lot');
     const err = msg => { errBox(v, msg); $('e-req-bars').innerHTML = ''; $('e-req-note').textContent = ''; lot.hidden = true; reqLast = null; };
-    if (!(pu > 0 && pu < 1)) return err('不良率の上限は 0〜100 % の間で入力する');
-    if (!(x >= 0) || !(st.xa === x)) return err('許容する不良数は 0 以上の整数で入力する');
-    if (N !== null && !(N >= 1)) return err('ロットサイズは 1 以上の整数で入力する');
+    if (!(pu > 0 && pu < 1)) return err('不良率の上限は0〜100 %の間で入力する');
+    if (!(x >= 0) || !(st.xa === x)) return err('許容する不良数は0以上の整数で入力する');
+    if (N !== null && !(N >= 1)) return err('ロットサイズは1以上の整数で入力する');
     const cs = Math.round(conf * 100);
     const n = S.requiredSample(pu, x, conf, N);
     const dist = N ? '超幾何分布' : '二項分布';
     if (n === null) {
-      v.innerHTML = `<div class="eyebrow">条件を満たす検査数なし</div><div class="big">${N ? `ロット ${fmtInt(N)} 個を全数検査しても示せない` : '検査数が大きすぎる'}</div>
-        <p class="note">${N ? `ロットの不良が ${fmtInt(Math.floor(pu * N + 1e-9))} 個以下と言うには、許容する不良数を減らすか、不良率の上限を上げる。` : '不良率の上限を上げるか、許容する不良数を減らす。'}</p>`;
+      v.innerHTML = `<div class="eyebrow">条件を満たす検査数なし</div><div class="big">${N ? `ロット${fmtInt(N)}個を全数検査しても示せない` : '検査数が大きすぎる'}</div>
+        <p class="note">${N ? `ロットの不良が${fmtInt(Math.floor(pu * N + 1e-9))}個以下と言うには、許容する不良数を減らすか、不良率の上限を上げる。` : '不良率の上限を上げるか、許容する不良数を減らす。'}</p>`;
       $('e-req-bars').innerHTML = ''; $('e-req-note').textContent = ''; lot.hidden = true; reqLast = null;
     } else {
       reqLast = { n, x };
       let calc = '';
       if (x === 0 && !N) {
         const raw = Math.log(1 - conf) / Math.log(1 - pu);
-        calc = `<p class="note">不良 0 個なら n = ln(1 − ${cs} %) ÷ ln(1 − ${pct(pu)}) = ${raw.toFixed(1)} → 切り上げて ${fmtInt(n)} 個。</p>`;
+        calc = `<p class="note">不良0個ならn = ln(1 − ${cs} %) ÷ ln(1 − ${pct(pu)}) = ${raw.toFixed(1)} → 切り上げて${fmtInt(n)}個。</p>`;
       }
-      v.innerHTML = `<div class="eyebrow">必要な検査数（${dist}、信頼度 ${cs} %）</div>
-        <div class="big">${num(fmtInt(n))} 個を検査する</div>
-        <div class="rules"><span class="chip ok"><span class="ic">✓</span>不良 ${num(x)} 個以下 → ${pct(pu)} 以下と言える</span><span class="chip ng"><span class="ic">✕</span>${num(x + 1)} 個以上 → 言えない</span></div>
+      v.innerHTML = `<div class="eyebrow">必要な検査数（${dist}、信頼度${cs} %）</div>
+        <div class="big">${num(fmtInt(n))}個を検査する</div>
+        <div class="rules"><span class="chip ok"><span class="ic">✓</span>不良${num(x)}個以下 → ${pct(pu)}以下と言える</span><span class="chip ng"><span class="ic">✕</span>${num(x + 1)}個以上 → 言えない</span></div>
         ${calc}`;
       // 許容する不良数ごとの必要数
       const kMax = Math.min(12, Math.max(5, x + 2));
@@ -865,21 +865,21 @@
         if (nk === null) break;
         bars.push({
           label: String(k), y: nk, color: k === x ? cssVar('--accent') : cssVar('--muted'),
-          tip: `<div>不良 ${k} 個まで許容：<b class="num">${fmtInt(nk)}</b> 個</div>`
+          tip: `<div>不良${k}個まで許容：<b class="num">${fmtInt(nk)}</b> 個</div>`
         });
       }
       const mx = Math.max(...bars.map(b => b.y));
       drawBars($('e-req-bars'), {
-        bars, yMax: niceMax(mx * 1.15), yFmt: y => fmtInt(Math.round(y)), xTitle: '許容する不良数 x', yTitle: '必要な検査数 [個]',
+        bars, yMax: niceMax(mx * 1.15), yFmt: y => fmtInt(Math.round(y)), xTitle: '許容する不良数x', yTitle: '必要な検査数 [個]',
         showValues: () => true, valueFmt: y => fmtInt(y)
       });
       $('e-req-note').textContent = `許容する不良数を増やすほど検査数は増えるが、たまたま不良が出ただけで「言えない」になる心配は減る。`;
       if (N) {
         const Dmax = Math.floor(pu * N + 1e-9);
         lot.hidden = false;
-        lot.innerHTML = `<div class="viz-title"><span>ロット ${fmtInt(N)} 個のうち検査する数</span><b>${pct(n / N)}</b></div>
-          ${lotBar([{ cls: 'samp', n, text: n / N >= 0.15 ? `検査 ${fmtInt(n)}` : '' }, { cls: 'rest', n: N - n, text: N - n > 0 ? `検査しない ${fmtInt(N - n)}` : '' }])}
-          <p class="note" style="margin-top:8px">合格（不良 ${fmtInt(x)} 個以下）なら、ロット全体の不良は ${fmtInt(Dmax)} 個以下（${pct(Dmax / N)}）と言える。</p>
+        lot.innerHTML = `<div class="viz-title"><span>ロット${fmtInt(N)}個のうち検査する数</span><b>${pct(n / N)}</b></div>
+          ${lotBar([{ cls: 'samp', n, text: n / N >= 0.15 ? `検査${fmtInt(n)}` : '' }, { cls: 'rest', n: N - n, text: N - n > 0 ? `検査しない${fmtInt(N - n)}` : '' }])}
+          <p class="note" style="margin-top:8px">合格（不良${fmtInt(x)}個以下）なら、ロット全体の不良は${fmtInt(Dmax)}個以下（${pct(Dmax / N)}）と言える。</p>
           <div class="key"><span style="--c:var(--accent)">検査</span><span style="--c:var(--grid)">検査しない</span></div>`;
       } else lot.hidden = true;
     }
